@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Docker | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="常用指令docker images 列出本地 docker 镜像docker ps -a 	列出所有正在运行的容器docker stop containerID	停止容器docker start containerID	开始容器sudo docker exec -it containerID &#x2F;bin&#x2F;bash  	进入容器内linux --mount 	 挂载 Unix 文件系统（ Unix F">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Docker">
+<meta property="og:url" content="http://example.com/2024/04/16/2018_dockerNotes/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="常用指令docker images 列出本地 docker 镜像docker ps -a 	列出所有正在运行的容器docker stop containerID	停止容器docker start containerID	开始容器sudo docker exec -it containerID &#x2F;bin&#x2F;bash  	进入容器内linux --mount 	 挂载 Unix 文件系统（ Unix F">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://ygria.oss-cn-hangzhou.aliyuncs.com/Hexo/docker%E4%BC%98%E5%8A%BF.png">
+<meta property="article:published_time" content="2024-04-16T04:15:29.060Z">
+<meta property="article:modified_time" content="2024-04-16T02:45:34.485Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="运维">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="编程">
+<meta property="article:tag" content="2018">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ygria.oss-cn-hangzhou.aliyuncs.com/Hexo/docker%E4%BC%98%E5%8A%BF.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-2018_dockerNotes" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2024/04/16/2018_dockerNotes/" class="article-date">
+  <time class="dt-published" datetime="2024-04-16T04:15:29.060Z" itemprop="datePublished">2024-04-16</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      Docker
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="常用指令"><a href="#常用指令" class="headerlink" title="常用指令"></a>常用指令</h1><p><code>docker images</code> 列出本地 docker 镜像<br><code>docker ps -a</code> 	列出所有正在运行的容器<br><code>docker stop containerID</code>	停止容器<br><code>docker start containerID</code>	开始容器<br><code>sudo docker exec -it containerID /bin/bash</code>  	进入容器内<br><code>linux --mount</code> 	 挂载 Unix 文件系统（ Unix File System ）之外的文件，或使用 Volume 数据卷。</p>
+<p>容器互联：</p>
+<p>推荐将容器加入自定义的Docker网络，连接多个容器，或使用<code>--link</code> 指令。</p>
+<h1 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h1><p>基于Linux内核和 LXC (Linux Container) 技术，对进程进行封装和隔离，属于操作系统层面的虚拟化技术，在容器的基础上，进行了进一步的封装，从文件系统、网络互联到进程隔离等等，极大的简化了容器的创建和维护。</p>
+<h1 id="优势"><a href="#优势" class="headerlink" title="优势"></a>优势</h1><p>相较于传统的虚拟机技术，docker 具有更加轻量级、易于管理和并发的特点。</p>
+<p><img src="https://ygria.oss-cn-hangzhou.aliyuncs.com/Hexo/docker%E4%BC%98%E5%8A%BF.png" alt="image"></p>
+<h1 id="Docker-基本概念："><a href="#Docker-基本概念：" class="headerlink" title="Docker 基本概念："></a>Docker 基本概念：</h1><ul>
+<li>镜像（ Image ）</li>
+<li>容器 （ Container ）</li>
+<li>仓库 （ Repository ）</li>
+</ul>
+<h2 id="镜像"><a href="#镜像" class="headerlink" title="镜像"></a>镜像</h2><p>使用pull指令，可以拉取 DockerHub 中的开源镜像到本地使用。<br>docker pull mysql<br>docker images 列出本地的镜像</p>
+<h3 id="定制镜像"><a href="#定制镜像" class="headerlink" title="定制镜像"></a>定制镜像</h3><p>使用 DockerFile</p>
+<p>FROM scratch<br>FROM指令为以什么为基础镜像，若为scratch意味着不以任何镜像为基础。</p>
+<h2 id="容器"><a href="#容器" class="headerlink" title="容器"></a>容器</h2><p>容器之于镜像，如同实例之于类，创建容器，意为给镜像生成了一个实例。</p>
+<blockquote>
+<p>docker –name mysql -p 3306:3306 -d mysql<br>若不使用-d，容器会将输出的结果（STDOUT）打印到宿主机上。<br>如果使用了-d参数运行容器，容器会在后台运行，并不会在前台输出结果。若要看输出，可使用docker logs containerID指令进行查看。</p>
+</blockquote>
+<h2 id="仓库"><a href="#仓库" class="headerlink" title="仓库"></a>仓库</h2><p>在定制好个人的镜像后，可以搭建仓库进行存储。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2024/04/16/2018_dockerNotes/" data-id="clv1vrjh20001dovm4jal4xfm" data-title="Docker" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/2018/" rel="tag">2018</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Linux/" rel="tag">Linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%BC%96%E7%A8%8B/" rel="tag">编程</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%BF%90%E7%BB%B4/" rel="tag">运维</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2024/04/16/201710_readingNotes/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          2017年10月阅读笔记
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2024/04/16/2017TVSeries/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">2017年观影/剧杂记</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/2017/" rel="tag">2017</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/2018/" rel="tag">2018</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/" rel="tag">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%94%B5%E5%BD%B1/" rel="tag">电影</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%94%B5%E8%A7%86%E5%89%A7/" rel="tag">电视剧</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BC%96%E7%A8%8B/" rel="tag">编程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" rel="tag">读书笔记</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%BF%90%E7%BB%B4/" rel="tag">运维</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/2017/" style="font-size: 20px;">2017</a> <a href="/tags/2018/" style="font-size: 20px;">2018</a> <a href="/tags/Linux/" style="font-size: 10px;">Linux</a> <a href="/tags/%E7%94%B5%E5%BD%B1/" style="font-size: 10px;">电影</a> <a href="/tags/%E7%94%B5%E8%A7%86%E5%89%A7/" style="font-size: 10px;">电视剧</a> <a href="/tags/%E7%BC%96%E7%A8%8B/" style="font-size: 20px;">编程</a> <a href="/tags/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" style="font-size: 10px;">读书笔记</a> <a href="/tags/%E8%BF%90%E7%BB%B4/" style="font-size: 10px;">运维</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/04/">April 2024</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2024/04/16/201710_readingNotes/">2017年10月阅读笔记</a>
+          </li>
+        
+          <li>
+            <a href="/2024/04/16/2018_dockerNotes/">Docker</a>
+          </li>
+        
+          <li>
+            <a href="/2024/04/16/2017TVSeries/">2017年观影/剧杂记</a>
+          </li>
+        
+          <li>
+            <a href="/2024/04/16/Head%20First%20%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAHTML%20CSS/">Head First 深入浅出HTML CSS</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2024 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
