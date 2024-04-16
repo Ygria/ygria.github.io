@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="功能概述：  根据后端返回接口，实现路由动态显示 实现按钮（HTML元素）级别权限控制  涉及知识点：  路由守卫 Vuex使用 Vue自定义指令  导航守卫 前端工程采用Github开源项目Vue-element-admin作为模板，该项目地址：Github | Vue-element-admin 。   在Vue-element-admin模板项目的src&#x2F;permission.js">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vue 定义指令和动态路由实现权限控制">
+<meta property="og:url" content="http://example.com/2020/08/27/Vue%20%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8C%87%E4%BB%A4%E5%92%8C%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1%E5%AE%9E%E7%8E%B0%E6%9D%83%E9%99%90%E6%8E%A7%E5%88%B6/index.html">
+<meta property="og:site_name" content="孤光自照">
+<meta property="og:description" content="功能概述：  根据后端返回接口，实现路由动态显示 实现按钮（HTML元素）级别权限控制  涉及知识点：  路由守卫 Vuex使用 Vue自定义指令  导航守卫 前端工程采用Github开源项目Vue-element-admin作为模板，该项目地址：Github | Vue-element-admin 。   在Vue-element-admin模板项目的src&#x2F;permission.js">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82ODEwNjIwLWNlODcwMTFmNDBkYjljNzIucG5n?x-oss-process=image/format,png">
+<meta property="og:image" content="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82ODEwNjIwLTJiNDNjZGFjNThmZmQzM2IucG5n?x-oss-process=image/format,png">
+<meta property="og:image" content="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82ODEwNjIwLWExZTQyODhhOTAzODA4MGQucG5n?x-oss-process=image/format,png">
+<meta property="article:published_time" content="2020-08-26T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-04-16T06:05:09.562Z">
+<meta property="article:author" content="Ygria">
+<meta property="article:tag" content="编程">
+<meta property="article:tag" content="前端">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82ODEwNjIwLWNlODcwMTFmNDBkYjljNzIucG5n?x-oss-process=image/format,png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Vue 定义指令和动态路由实现权限控制</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Archives</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tag</a></li><!--
+     --><!--
+       --><li><a href="/categories/">Category</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2020/10/22/Vue%20+WebSocket%20+%20WaveSurferJS%20%E5%AE%9E%E7%8E%B0H5%E8%81%8A%E5%A4%A9%E5%AF%B9%E8%AF%9D%E4%BA%A4%E4%BA%92/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2020/08/08/Vue+Element%20UI%20%E6%A0%91%E5%BD%A2%E6%8E%A7%E4%BB%B6%E6%95%B4%E5%90%88%E4%B8%8B%E6%8B%89%E5%8A%9F%E8%83%BD%E8%8F%9C%E5%8D%95%EF%BC%88tree%20+%20dropdown%20+input%EF%BC%89/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2020/08/27/Vue%20%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8C%87%E4%BB%A4%E5%92%8C%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1%E5%AE%9E%E7%8E%B0%E6%9D%83%E9%99%90%E6%8E%A7%E5%88%B6/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2020/08/27/Vue%20%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8C%87%E4%BB%A4%E5%92%8C%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1%E5%AE%9E%E7%8E%B0%E6%9D%83%E9%99%90%E6%8E%A7%E5%88%B6/&text=Vue 定义指令和动态路由实现权限控制"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2020/08/27/Vue%20%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8C%87%E4%BB%A4%E5%92%8C%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1%E5%AE%9E%E7%8E%B0%E6%9D%83%E9%99%90%E6%8E%A7%E5%88%B6/&title=Vue 定义指令和动态路由实现权限控制"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2020/08/27/Vue%20%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8C%87%E4%BB%A4%E5%92%8C%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1%E5%AE%9E%E7%8E%B0%E6%9D%83%E9%99%90%E6%8E%A7%E5%88%B6/&is_video=false&description=Vue 定义指令和动态路由实现权限控制"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Vue 定义指令和动态路由实现权限控制&body=Check out this article: http://example.com/2020/08/27/Vue%20%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8C%87%E4%BB%A4%E5%92%8C%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1%E5%AE%9E%E7%8E%B0%E6%9D%83%E9%99%90%E6%8E%A7%E5%88%B6/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2020/08/27/Vue%20%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8C%87%E4%BB%A4%E5%92%8C%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1%E5%AE%9E%E7%8E%B0%E6%9D%83%E9%99%90%E6%8E%A7%E5%88%B6/&title=Vue 定义指令和动态路由实现权限控制"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2020/08/27/Vue%20%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8C%87%E4%BB%A4%E5%92%8C%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1%E5%AE%9E%E7%8E%B0%E6%9D%83%E9%99%90%E6%8E%A7%E5%88%B6/&title=Vue 定义指令和动态路由实现权限控制"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2020/08/27/Vue%20%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8C%87%E4%BB%A4%E5%92%8C%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1%E5%AE%9E%E7%8E%B0%E6%9D%83%E9%99%90%E6%8E%A7%E5%88%B6/&title=Vue 定义指令和动态路由实现权限控制"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2020/08/27/Vue%20%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8C%87%E4%BB%A4%E5%92%8C%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1%E5%AE%9E%E7%8E%B0%E6%9D%83%E9%99%90%E6%8E%A7%E5%88%B6/&title=Vue 定义指令和动态路由实现权限控制"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2020/08/27/Vue%20%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8C%87%E4%BB%A4%E5%92%8C%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1%E5%AE%9E%E7%8E%B0%E6%9D%83%E9%99%90%E6%8E%A7%E5%88%B6/&name=Vue 定义指令和动态路由实现权限控制&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2020/08/27/Vue%20%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8C%87%E4%BB%A4%E5%92%8C%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1%E5%AE%9E%E7%8E%B0%E6%9D%83%E9%99%90%E6%8E%A7%E5%88%B6/&t=Vue 定义指令和动态路由实现权限控制"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AF%BC%E8%88%AA%E5%AE%88%E5%8D%AB"><span class="toc-number">1.</span> <span class="toc-text">导航守卫</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%90%8E%E5%8F%B0%E8%BF%94%E5%9B%9E%E6%8E%A5%E5%8F%A3"><span class="toc-number">1.1.</span> <span class="toc-text">后台返回接口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8VueX%E5%AD%98%E5%82%A8%E6%9D%83%E9%99%90%E4%BF%A1%E6%81%AF"><span class="toc-number">1.2.</span> <span class="toc-text">使用VueX存储权限信息</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%AE%9A%E4%B9%89%E5%BC%82%E6%AD%A5%E6%96%B9%E6%B3%95%EF%BC%8C%E6%96%B9%E6%B3%95%E5%86%85%E9%83%A8%E5%8C%85%E5%90%ABHTTP%E8%AF%B7%E6%B1%82%E4%BB%8E%E5%90%8E%E5%8F%B0%E6%8B%89%E5%8F%96%E6%95%B0%E6%8D%AE"><span class="toc-number">1.2.1.</span> <span class="toc-text">1.定义异步方法，方法内部包含HTTP请求从后台拉取数据</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%AE%9A%E4%B9%89%E9%9D%99%E6%80%81%E3%80%81%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1"><span class="toc-number">1.2.2.</span> <span class="toc-text">2. 定义静态、动态路由</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E6%A0%B9%E6%8D%AE%E6%9D%83%E9%99%90%E8%BF%87%E6%BB%A4%E5%B9%B6%E6%8E%92%E5%BA%8F%E8%B7%AF%E7%94%B1"><span class="toc-number">1.2.3.</span> <span class="toc-text">3.根据权限过滤并排序路由</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-src-permission-js%E4%B8%AD%E7%9A%84%E5%A4%84%E7%90%86%E9%80%BB%E8%BE%91"><span class="toc-number">1.2.4.</span> <span class="toc-text">4.src&#x2F;permission.js中的处理逻辑</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8C%87%E4%BB%A4"><span class="toc-number">2.</span> <span class="toc-text">自定义指令</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        Vue 定义指令和动态路由实现权限控制
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Ygria</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2020-08-26T16:00:00.000Z" class="dt-published" itemprop="datePublished">2020-08-27</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a>, <a class="p-category" href="/tags/%E7%BC%96%E7%A8%8B/" rel="tag">编程</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <p>功能概述：</p>
+<ul>
+<li>根据后端返回接口，实现路由动态显示</li>
+<li>实现按钮（HTML元素）级别权限控制</li>
+</ul>
+<p>涉及知识点：</p>
+<ul>
+<li>路由守卫</li>
+<li>Vuex使用</li>
+<li>Vue自定义指令</li>
+</ul>
+<h1 id="导航守卫"><a href="#导航守卫" class="headerlink" title="导航守卫"></a>导航守卫</h1><blockquote>
+<p>前端工程采用Github开源项目<code>Vue-element-admin</code>作为模板，该项目地址：<a target="_blank" rel="noopener" href="https://github.com/PanJiaChen/vue-element-admin">Github | Vue-element-admin</a> 。 </p>
+</blockquote>
+<p>在<code>Vue-element-admin</code>模板项目的<a target="_blank" rel="noopener" href="https://github.com/PanJiaChen/vue-element-admin/blob/master/src/permission.js">src&#x2F;permission.js</a>文件中，给出了路由守卫、加载动态路由的实现方案，在实现了基于不同角色加载动态路由的功能。我们只需要稍作改动，就能将基于角色加载路由改造为基于权限加载路由。</p>
+<blockquote>
+<p><strong>导航守卫</strong>：可以应用于在路由跳转时，对用户的登录状态或权限进行判断。项目中使用全局前置守卫。参考Vue官方文档：<a target="_blank" rel="noopener" href="https://router.vuejs.org/zh/guide/advanced/navigation-guards.html">https://router.vuejs.org/zh/guide/advanced/navigation-guards.html</a></p>
+</blockquote>
+<h2 id="后台返回接口"><a href="#后台返回接口" class="headerlink" title="后台返回接口"></a>后台返回接口</h2><p><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82ODEwNjIwLWNlODcwMTFmNDBkYjljNzIucG5n?x-oss-process=image/format,png" alt="getUserInfo接口返回用户信息和路由、操作权限等"><br>权限系统后台采用基于角色的权限控制方案（<code>role-based access control</code>），如上图所示，<br>该用户信息接口将查询用户所具有的所有角色，再将这些角色的权限并集按照路由 - 操作整合在一起返回。在用户登录入系统后，我们从后台请求获得用户信息（个人信息 + 权限信息），作为全局属性储存在前端。不同权限的用户看到的页面不同，依赖于这些属性，它们决定了路由如何加载、页面如何渲染。</p>
+<p>这种多个组件依赖一组属性的场景，Vue提供了<code>VueX</code>作为全局状态管理方案。</p>
+<h2 id="使用VueX存储权限信息"><a href="#使用VueX存储权限信息" class="headerlink" title="使用VueX存储权限信息"></a>使用VueX存储权限信息</h2><p>在<code>src/store/moudules</code>目录下定义<code>permission.js</code> </p>
+<h3 id="1-定义异步方法，方法内部包含HTTP请求从后台拉取数据"><a href="#1-定义异步方法，方法内部包含HTTP请求从后台拉取数据" class="headerlink" title="1.定义异步方法，方法内部包含HTTP请求从后台拉取数据"></a>1.定义异步方法，方法内部包含HTTP请求从后台拉取数据</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">import http from &#x27;../../axios&#x27;;</span><br><span class="line">async function getUserInfo() &#123;</span><br><span class="line">  const res = await http.getUserInfo();</span><br><span class="line">  return res;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>使用<code>await</code>关键字，保证执行顺序正确。这里是为了保证能拿到接口返回的内容，以便于下一步处理。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">const actions = &#123;</span><br><span class="line">  getPermissions(&#123; commit &#125;) &#123;</span><br><span class="line">    return new Promise(resolve =&gt; &#123;</span><br><span class="line">      getUserInfo().then(res =&gt; &#123;</span><br><span class="line">        if (res) &#123;</span><br><span class="line">          let permissionList = res.permissionList;</span><br><span class="line">          commit(&#x27;SET_PERMISSIONS&#x27;, permissionList);</span><br><span class="line">          // 根据后台返回的路由，生成实际可以访问的路由</span><br><span class="line">          let accessRoutes = filterAsyncRoutesByPermissions(asyncRoutes, permissionList);</span><br><span class="line">          commit(&#x27;SET_ROUTES&#x27;, accessRoutes);</span><br><span class="line">          commit(&#x27;SET_USER_INFO&#x27;, &#123; name: res.name, accountName: res.accountName &#125;)</span><br><span class="line">          resolve(accessRoutes);</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">          resolve([]);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;).catch(() =&gt; resolve([]));</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>VueX中action定义异步方法。</p>
+<h3 id="2-定义静态、动态路由"><a href="#2-定义静态、动态路由" class="headerlink" title="2. 定义静态、动态路由"></a>2. 定义静态、动态路由</h3><p><code>src/router/index.js</code><br>静态路由：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">export const constantRoutes = [</span><br><span class="line">    &#123;</span><br><span class="line">        path: &#x27;/redirect&#x27;,</span><br><span class="line">        component: Layout,</span><br><span class="line">        hidden: true,</span><br><span class="line">        children: [</span><br><span class="line">            &#123;</span><br><span class="line">                path: &#x27;/redirect/:path(.*)&#x27;,</span><br><span class="line">                component: () =&gt; import(&#x27;@/views/redirect/index&#x27;),</span><br><span class="line">            &#125;,</span><br><span class="line">        ],</span><br><span class="line">    ,</span><br><span class="line">  ...</span><br><span class="line">    &#123;</span><br><span class="line">        path: &#x27;/404&#x27;,</span><br><span class="line">        component: () =&gt; import(&#x27;@/views/error-page/404&#x27;),</span><br><span class="line">        hidden: true,</span><br><span class="line">    &#125;</span><br><span class="line">];</span><br></pre></td></tr></table></figure>
+<p>动态路由：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">export const asyncRoutes = [</span><br><span class="line">    &#123;</span><br><span class="line">        path: &#x27;/system&#x27;,</span><br><span class="line">        component: Layout,</span><br><span class="line">        name: &#x27;系统管理&#x27;,</span><br><span class="line">        meta: &#123; title: &#x27;系统管理&#x27;, icon: &#x27;el-icon-user&#x27;, affix: true &#125;,</span><br><span class="line">        children: [</span><br><span class="line">            &#123;</span><br><span class="line">                path: &#x27;/system&#x27;,</span><br><span class="line">                component: () =&gt; import(&#x27;@/views/management/system/Index&#x27;),</span><br><span class="line">                meta: &#123; title: &#x27;系统管理&#x27;, icon: &#x27;el-icon-setting&#x27;, affix: true &#125;,</span><br><span class="line">            &#125;,</span><br><span class="line">        ],</span><br><span class="line">    &#125;</span><br><span class="line">...</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<p>静态路由中定义了所有用户均可访问的路由，动态路由中定义了动态加载的路由。</p>
+<h3 id="3-根据权限过滤并排序路由"><a href="#3-根据权限过滤并排序路由" class="headerlink" title="3.根据权限过滤并排序路由"></a>3.根据权限过滤并排序路由</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">export function filterAsyncRoutesByPermissions(routes, menus) &#123;</span><br><span class="line">  const res = []</span><br><span class="line">  routes.forEach(route =&gt; &#123;</span><br><span class="line">    const tmp = &#123; ...route &#125;</span><br><span class="line">    let index = menus.map(menu =&gt; menu.url).indexOf(tmp.path);</span><br><span class="line">    if (index != -1) &#123;</span><br><span class="line">      // 后端返回路由信息覆盖前端定义路由信息</span><br><span class="line">      tmp.name = menus[index].name;</span><br><span class="line">      // debugger;</span><br><span class="line">      tmp.meta.title = menus[index].name;</span><br><span class="line">      tmp.children.forEach(child =&gt; &#123;</span><br><span class="line">        if (child.path == tmp.path) &#123;</span><br><span class="line">          child.meta.title = tmp.meta.title;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;)</span><br><span class="line">      res.push(tmp)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;);</span><br><span class="line">  // 根据返回菜单顺序，确定路由顺序</span><br><span class="line">  /**</span><br><span class="line">   * TODO 子菜单排序</span><br><span class="line">   */</span><br><span class="line">  res.sort((routeA, routeB) =&gt; menus.map(menu =&gt; menu.url).indexOf(routeA.path) - menus.map(menu =&gt; menu.url).indexOf(routeB.path))</span><br><span class="line">  return res</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>根据url匹配，匹配到url的路由则加入数组。最终用户可以访问的路由 &#x3D; 允许访问的动态路由 + 不需要权限的静态路由。</p>
+<h3 id="4-src-permission-js中的处理逻辑"><a href="#4-src-permission-js中的处理逻辑" class="headerlink" title="4.src&#x2F;permission.js中的处理逻辑"></a>4.src&#x2F;permission.js中的处理逻辑</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 引入store</span></span><br><span class="line"><span class="keyword">import</span> store <span class="keyword">from</span> <span class="string">&#x27;./store&#x27;</span>;</span><br><span class="line"><span class="keyword">const</span> whiteList = [<span class="string">&#x27;/login&#x27;</span>, <span class="string">&#x27;/auth-redirect&#x27;</span>]; <span class="comment">// no redirect whitelist</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 路由守卫</span></span><br><span class="line">router.<span class="title function_">beforeEach</span>(<span class="keyword">async</span> (to, <span class="keyword">from</span>, next) =&gt; &#123;</span><br><span class="line">    <span class="comment">//start progress bar</span></span><br><span class="line">    <span class="title class_">NProgress</span>.<span class="title function_">start</span>()</span><br><span class="line">    <span class="keyword">if</span> (hasToken) &#123;</span><br><span class="line">        <span class="keyword">if</span> (to.<span class="property">path</span> === <span class="string">&#x27;/login&#x27;</span>) &#123;</span><br><span class="line">          <span class="comment">// ... 省略登出逻辑</span></span><br><span class="line">            <span class="title class_">NProgress</span>.<span class="title function_">done</span>();</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;    </span><br><span class="line">            <span class="comment">// 查看是否已缓存过动态路由</span></span><br><span class="line">            <span class="keyword">const</span> hasRoutes = store.<span class="property">getters</span>.<span class="property">permission_routes</span> &amp;&amp; store.<span class="property">getters</span>.<span class="property">permission_routes</span>.<span class="property">length</span> &gt; <span class="number">0</span>;</span><br><span class="line">            <span class="keyword">if</span> (hasRoutes) &#123;</span><br><span class="line">                <span class="title function_">next</span>();</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    <span class="keyword">const</span> accessRoutes = <span class="keyword">await</span> store.<span class="title function_">dispatch</span>(<span class="string">&#x27;permission/getPermissions&#x27;</span>);</span><br><span class="line">                    router.<span class="title function_">addRoutes</span>(accessRoutes);</span><br><span class="line">                    <span class="keyword">const</span> toRoute = accessRoutes.<span class="title function_">filter</span>(<span class="function">(<span class="params">route</span>) =&gt;</span> route.<span class="property">path</span> == to.<span class="property">path</span>);</span><br><span class="line">                    <span class="title function_">next</span>(&#123; <span class="attr">path</span>: toRoute.<span class="property">length</span> &gt; <span class="number">0</span> ? toRoute[<span class="number">0</span>].<span class="property">path</span> : accessRoutes[<span class="number">0</span>].<span class="property">path</span>, <span class="attr">replace</span>: <span class="literal">true</span> &#125;);</span><br><span class="line">                &#125; <span class="keyword">catch</span> (error) &#123;</span><br><span class="line">                    <span class="title function_">next</span>(<span class="string">`/login?redirect=<span class="subst">$&#123;to.path&#125;</span>`</span>);</span><br><span class="line">                    <span class="title class_">NProgress</span>.<span class="title function_">done</span>();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (whiteList.<span class="title function_">indexOf</span>(to.<span class="property">path</span>) !== -<span class="number">1</span>) &#123;</span><br><span class="line">            <span class="comment">// in the free login whitelist, go directly</span></span><br><span class="line">            <span class="title function_">next</span>();</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="title function_">next</span>(<span class="string">`/login?redirect=<span class="subst">$&#123;to.path&#125;</span>`</span>);</span><br><span class="line">            <span class="title class_">NProgress</span>.<span class="title function_">done</span>();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">router.<span class="title function_">afterEach</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// finish progress bar</span></span><br><span class="line">    <span class="title class_">NProgress</span>.<span class="title function_">done</span>();</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>以上是动态路由实现方案。</p>
+<hr>
+<p><code>Vue</code>支持自定义指令，用法类似于Vue原生指令如<code>v-model</code>、<code>v-on</code>等，网上查阅到的大部分细粒度权限控制方案都使用这种方法。下面将给出我的实现。</p>
+<h1 id="自定义指令"><a href="#自定义指令" class="headerlink" title="自定义指令"></a>自定义指令</h1><p>自定义指令 <code>v-permission</code>：</p>
+<p><code>src/directive/permission/index.js</code></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> store <span class="keyword">from</span> <span class="string">&#x27;@/store&#x27;</span></span><br><span class="line"> <span class="keyword">export</span> <span class="keyword">default</span> &#123;</span><br><span class="line">  <span class="title function_">inserted</span>(<span class="params">el, binding, vnode</span>) &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; value &#125; = binding</span><br><span class="line">    <span class="keyword">const</span> permissions = store.<span class="property">getters</span> &amp;&amp; store.<span class="property">getters</span>.<span class="property">permissions</span>;</span><br><span class="line">    <span class="keyword">if</span> (value) &#123;</span><br><span class="line">      <span class="comment">// 获取当前所挂载的vue所在的上下文节点url</span></span><br><span class="line">      <span class="keyword">let</span> url = vnode.<span class="property">context</span>.<span class="property">$route</span>.<span class="property">path</span>;</span><br><span class="line">      <span class="keyword">let</span> permissionActions = permissions[url];</span><br><span class="line">      <span class="comment">// console.log(permissionActions)</span></span><br><span class="line">      <span class="keyword">const</span> hasPermission = permissionActions.<span class="title function_">some</span>(<span class="function"><span class="params">action</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (value.<span class="property">constructor</span> === <span class="title class_">Array</span>) &#123;</span><br><span class="line">          <span class="comment">// 或判断： 只要存在任1，判定为有权限</span></span><br><span class="line">          <span class="keyword">return</span> value.<span class="title function_">includes</span>(action);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">          <span class="keyword">return</span> action === value;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;)</span><br><span class="line">      <span class="keyword">if</span> (!hasPermission) &#123;</span><br><span class="line">        el.<span class="property">parentNode</span> &amp;&amp; el.<span class="property">parentNode</span>.<span class="title function_">removeChild</span>(el)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">Error</span>(<span class="string">`need further permissions!`</span>)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<p>后端给出的权限数据是路由（url）与操作的对应Map，url可以通过将要挂载到的vnode属性拿到。这个方法有点类似于AOP，在虚拟元素挂载之后做判断，如果没有权限则从父元素上移除掉。<br>使用方法：</p>
+<ul>
+<li>举例一：单个按钮 （注意双引号套单引号的写法）<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"> <span class="tag">&lt;<span class="name">el-button</span> @<span class="attr">click.native.prevent</span>=<span class="string">&quot;editUser(scope.row)&quot;</span> <span class="attr">type</span>=<span class="string">&quot;text&quot;</span> <span class="attr">size</span>=<span class="string">&quot;small&quot;</span> <span class="attr">v-permission</span>=<span class="string">&quot;&#x27;op_edit&#x27;&quot;</span>&gt;</span></span><br><span class="line">                               编辑</span><br><span class="line"><span class="tag">&lt;/<span class="name">el-button</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li>举例二：或判断（传入数组），只要拥有数组中一个权限，则保留元素，所有权限都没有，则移除。<br>在上一篇博客<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/066c4ce4c767">https://www.jianshu.com/p/066c4ce4c767</a><br>下拉菜单上增加控制：<br><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82ODEwNjIwLTJiNDNjZGFjNThmZmQzM2IucG5n?x-oss-process=image/format,png" alt="dot-dropdown"><br><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82ODEwNjIwLWExZTQyODhhOTAzODA4MGQucG5n?x-oss-process=image/format,png" alt="数据定义"><br>相应数据定义中增加action属性。</li>
+</ul>
+<p>该方法无法覆盖所有场景，所以依然给出相应工具类：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * </span><br><span class="line"> * @param &#123;*当前页面路由&#125; url </span><br><span class="line"> * @param &#123;*操作code e.g op_add &#125; value </span><br><span class="line"> * @return true/false 是否有该项权限</span><br><span class="line"> */</span><br><span class="line">function checkPermission(url, value) &#123;</span><br><span class="line"></span><br><span class="line">    const permissions = store.getters &amp;&amp; store.getters.permissions;</span><br><span class="line">    let permissionActions = permissions[url];</span><br><span class="line"></span><br><span class="line">    if (!permissionActions) &#123;</span><br><span class="line">        return false;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    let hasPermission = permissionActions.some(action =&gt; &#123;</span><br><span class="line">        if (value.constructor === Array) &#123;</span><br><span class="line">            // 或判断： 只要存在任1，判定为有权限</span><br><span class="line">            return value.includes(action);</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            return action === value;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">    return hasPermission;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p> 以上完成按钮粒度权限控制。</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/about/">About</a></li>
+        
+          <li><a href="/archives/">Archives</a></li>
+        
+          <li><a href="/tags/">Tag</a></li>
+        
+          <li><a href="/categories/">Category</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AF%BC%E8%88%AA%E5%AE%88%E5%8D%AB"><span class="toc-number">1.</span> <span class="toc-text">导航守卫</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%90%8E%E5%8F%B0%E8%BF%94%E5%9B%9E%E6%8E%A5%E5%8F%A3"><span class="toc-number">1.1.</span> <span class="toc-text">后台返回接口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8VueX%E5%AD%98%E5%82%A8%E6%9D%83%E9%99%90%E4%BF%A1%E6%81%AF"><span class="toc-number">1.2.</span> <span class="toc-text">使用VueX存储权限信息</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%AE%9A%E4%B9%89%E5%BC%82%E6%AD%A5%E6%96%B9%E6%B3%95%EF%BC%8C%E6%96%B9%E6%B3%95%E5%86%85%E9%83%A8%E5%8C%85%E5%90%ABHTTP%E8%AF%B7%E6%B1%82%E4%BB%8E%E5%90%8E%E5%8F%B0%E6%8B%89%E5%8F%96%E6%95%B0%E6%8D%AE"><span class="toc-number">1.2.1.</span> <span class="toc-text">1.定义异步方法，方法内部包含HTTP请求从后台拉取数据</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%AE%9A%E4%B9%89%E9%9D%99%E6%80%81%E3%80%81%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1"><span class="toc-number">1.2.2.</span> <span class="toc-text">2. 定义静态、动态路由</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E6%A0%B9%E6%8D%AE%E6%9D%83%E9%99%90%E8%BF%87%E6%BB%A4%E5%B9%B6%E6%8E%92%E5%BA%8F%E8%B7%AF%E7%94%B1"><span class="toc-number">1.2.3.</span> <span class="toc-text">3.根据权限过滤并排序路由</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-src-permission-js%E4%B8%AD%E7%9A%84%E5%A4%84%E7%90%86%E9%80%BB%E8%BE%91"><span class="toc-number">1.2.4.</span> <span class="toc-text">4.src&#x2F;permission.js中的处理逻辑</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8C%87%E4%BB%A4"><span class="toc-number">2.</span> <span class="toc-text">自定义指令</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2020/08/27/Vue%20%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8C%87%E4%BB%A4%E5%92%8C%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1%E5%AE%9E%E7%8E%B0%E6%9D%83%E9%99%90%E6%8E%A7%E5%88%B6/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2020/08/27/Vue%20%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8C%87%E4%BB%A4%E5%92%8C%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1%E5%AE%9E%E7%8E%B0%E6%9D%83%E9%99%90%E6%8E%A7%E5%88%B6/&text=Vue 定义指令和动态路由实现权限控制"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2020/08/27/Vue%20%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8C%87%E4%BB%A4%E5%92%8C%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1%E5%AE%9E%E7%8E%B0%E6%9D%83%E9%99%90%E6%8E%A7%E5%88%B6/&title=Vue 定义指令和动态路由实现权限控制"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2020/08/27/Vue%20%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8C%87%E4%BB%A4%E5%92%8C%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1%E5%AE%9E%E7%8E%B0%E6%9D%83%E9%99%90%E6%8E%A7%E5%88%B6/&is_video=false&description=Vue 定义指令和动态路由实现权限控制"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Vue 定义指令和动态路由实现权限控制&body=Check out this article: http://example.com/2020/08/27/Vue%20%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8C%87%E4%BB%A4%E5%92%8C%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1%E5%AE%9E%E7%8E%B0%E6%9D%83%E9%99%90%E6%8E%A7%E5%88%B6/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2020/08/27/Vue%20%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8C%87%E4%BB%A4%E5%92%8C%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1%E5%AE%9E%E7%8E%B0%E6%9D%83%E9%99%90%E6%8E%A7%E5%88%B6/&title=Vue 定义指令和动态路由实现权限控制"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2020/08/27/Vue%20%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8C%87%E4%BB%A4%E5%92%8C%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1%E5%AE%9E%E7%8E%B0%E6%9D%83%E9%99%90%E6%8E%A7%E5%88%B6/&title=Vue 定义指令和动态路由实现权限控制"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2020/08/27/Vue%20%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8C%87%E4%BB%A4%E5%92%8C%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1%E5%AE%9E%E7%8E%B0%E6%9D%83%E9%99%90%E6%8E%A7%E5%88%B6/&title=Vue 定义指令和动态路由实现权限控制"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2020/08/27/Vue%20%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8C%87%E4%BB%A4%E5%92%8C%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1%E5%AE%9E%E7%8E%B0%E6%9D%83%E9%99%90%E6%8E%A7%E5%88%B6/&title=Vue 定义指令和动态路由实现权限控制"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2020/08/27/Vue%20%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8C%87%E4%BB%A4%E5%92%8C%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1%E5%AE%9E%E7%8E%B0%E6%9D%83%E9%99%90%E6%8E%A7%E5%88%B6/&name=Vue 定义指令和动态路由实现权限控制&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2020/08/27/Vue%20%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8C%87%E4%BB%A4%E5%92%8C%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1%E5%AE%9E%E7%8E%B0%E6%9D%83%E9%99%90%E6%8E%A7%E5%88%B6/&t=Vue 定义指令和动态路由实现权限控制"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2024
+    Ygria
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Archives</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tag</a></li><!--
+     --><!--
+       --><li><a href="/categories/">Category</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

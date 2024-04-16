@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="问题背景前端交互中经常使用确认框。在删除、修改等操作时，调用后端接口之前，先跳出弹框显示提示信息，提示用户确认，避免用户误操作。项目中全局引入了Element，提供了一套模态对话框组件，用于消息提示、确认消息、提交内容，使用起来也非常简便。 以下来自于element官网文档：  如果你完整引入了 Element，它会为Vue.prototype添加如下全局方法：  $msgbox, $alert,">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vue基础：使用Vue.extend()实现自定义确认框">
+<meta property="og:url" content="http://example.com/2020/04/28/Vue%E5%9F%BA%E7%A1%80%EF%BC%9A%E4%BD%BF%E7%94%A8Vue.extend()%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%AE%9A%E4%B9%89%E7%A1%AE%E8%AE%A4%E6%A1%86/index.html">
+<meta property="og:site_name" content="孤光自照">
+<meta property="og:description" content="问题背景前端交互中经常使用确认框。在删除、修改等操作时，调用后端接口之前，先跳出弹框显示提示信息，提示用户确认，避免用户误操作。项目中全局引入了Element，提供了一套模态对话框组件，用于消息提示、确认消息、提交内容，使用起来也非常简便。 以下来自于element官网文档：  如果你完整引入了 Element，它会为Vue.prototype添加如下全局方法：  $msgbox, $alert,">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82ODEwNjIwLTJhNWM3NDc3NWRiNjY5NmMucG5n?x-oss-process=image/format,png">
+<meta property="article:published_time" content="2020-04-28T09:02:00.000Z">
+<meta property="article:modified_time" content="2024-04-16T06:14:58.151Z">
+<meta property="article:author" content="Ygria">
+<meta property="article:tag" content="编程">
+<meta property="article:tag" content="前端">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82ODEwNjIwLTJhNWM3NDc3NWRiNjY5NmMucG5n?x-oss-process=image/format,png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Vue基础：使用Vue.extend()实现自定义确认框</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Archives</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tag</a></li><!--
+     --><!--
+       --><li><a href="/categories/">Category</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2020/05/08/Java%EF%BC%9A%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B3%A8%E8%A7%A3+%E5%8F%8D%E5%B0%84%E5%AE%9E%E7%8E%B0%E5%AF%BC%E5%85%A5%E5%AF%BC%E5%87%BAExcel%E6%96%87%E6%A1%A3/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2020/04/25/Vue%E5%9F%BA%E7%A1%80%EF%BC%9A%E5%AD%90%E7%BB%84%E4%BB%B6%E6%8A%BD%E5%8F%96%E4%B8%8E%E7%88%B6%E5%AD%90%E7%BB%84%E4%BB%B6%E9%80%9A%E4%BF%A1/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2020/04/28/Vue%E5%9F%BA%E7%A1%80%EF%BC%9A%E4%BD%BF%E7%94%A8Vue.extend()%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%AE%9A%E4%B9%89%E7%A1%AE%E8%AE%A4%E6%A1%86/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2020/04/28/Vue%E5%9F%BA%E7%A1%80%EF%BC%9A%E4%BD%BF%E7%94%A8Vue.extend()%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%AE%9A%E4%B9%89%E7%A1%AE%E8%AE%A4%E6%A1%86/&text=Vue基础：使用Vue.extend()实现自定义确认框"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2020/04/28/Vue%E5%9F%BA%E7%A1%80%EF%BC%9A%E4%BD%BF%E7%94%A8Vue.extend()%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%AE%9A%E4%B9%89%E7%A1%AE%E8%AE%A4%E6%A1%86/&title=Vue基础：使用Vue.extend()实现自定义确认框"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2020/04/28/Vue%E5%9F%BA%E7%A1%80%EF%BC%9A%E4%BD%BF%E7%94%A8Vue.extend()%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%AE%9A%E4%B9%89%E7%A1%AE%E8%AE%A4%E6%A1%86/&is_video=false&description=Vue基础：使用Vue.extend()实现自定义确认框"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Vue基础：使用Vue.extend()实现自定义确认框&body=Check out this article: http://example.com/2020/04/28/Vue%E5%9F%BA%E7%A1%80%EF%BC%9A%E4%BD%BF%E7%94%A8Vue.extend()%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%AE%9A%E4%B9%89%E7%A1%AE%E8%AE%A4%E6%A1%86/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2020/04/28/Vue%E5%9F%BA%E7%A1%80%EF%BC%9A%E4%BD%BF%E7%94%A8Vue.extend()%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%AE%9A%E4%B9%89%E7%A1%AE%E8%AE%A4%E6%A1%86/&title=Vue基础：使用Vue.extend()实现自定义确认框"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2020/04/28/Vue%E5%9F%BA%E7%A1%80%EF%BC%9A%E4%BD%BF%E7%94%A8Vue.extend()%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%AE%9A%E4%B9%89%E7%A1%AE%E8%AE%A4%E6%A1%86/&title=Vue基础：使用Vue.extend()实现自定义确认框"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2020/04/28/Vue%E5%9F%BA%E7%A1%80%EF%BC%9A%E4%BD%BF%E7%94%A8Vue.extend()%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%AE%9A%E4%B9%89%E7%A1%AE%E8%AE%A4%E6%A1%86/&title=Vue基础：使用Vue.extend()实现自定义确认框"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2020/04/28/Vue%E5%9F%BA%E7%A1%80%EF%BC%9A%E4%BD%BF%E7%94%A8Vue.extend()%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%AE%9A%E4%B9%89%E7%A1%AE%E8%AE%A4%E6%A1%86/&title=Vue基础：使用Vue.extend()实现自定义确认框"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2020/04/28/Vue%E5%9F%BA%E7%A1%80%EF%BC%9A%E4%BD%BF%E7%94%A8Vue.extend()%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%AE%9A%E4%B9%89%E7%A1%AE%E8%AE%A4%E6%A1%86/&name=Vue基础：使用Vue.extend()实现自定义确认框&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2020/04/28/Vue%E5%9F%BA%E7%A1%80%EF%BC%9A%E4%BD%BF%E7%94%A8Vue.extend()%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%AE%9A%E4%B9%89%E7%A1%AE%E8%AE%A4%E6%A1%86/&t=Vue基础：使用Vue.extend()实现自定义确认框"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%97%AE%E9%A2%98%E8%83%8C%E6%99%AF"><span class="toc-number">1.</span> <span class="toc-text">问题背景</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0%E5%B0%9D%E8%AF%95"><span class="toc-number">2.</span> <span class="toc-text">实现尝试</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9C%A8%E5%8D%95%E7%BB%84%E4%BB%B6%E5%86%85%E9%83%A8%E5%AE%9E%E7%8E%B0%E7%A1%AE%E8%AE%A4%E6%A1%86"><span class="toc-number">2.1.</span> <span class="toc-text">在单组件内部实现确认框</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E6%8A%BD%E5%8F%96%EF%BC%9F"><span class="toc-number">2.2.</span> <span class="toc-text">如何抽取？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BD%BF%E7%94%A8extend"><span class="toc-number">2.2.1.</span> <span class="toc-text">为什么使用extend</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Vue-extend"><span class="toc-number">2.3.</span> <span class="toc-text">Vue.extend()</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0"><span class="toc-number">3.</span> <span class="toc-text">代码实现</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">4.</span> <span class="toc-text">总结</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        Vue基础：使用Vue.extend()实现自定义确认框
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Ygria</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2020-04-28T09:02:00.000Z" class="dt-published" itemprop="datePublished">2020-04-28</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a>, <a class="p-category" href="/tags/%E7%BC%96%E7%A8%8B/" rel="tag">编程</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h1 id="问题背景"><a href="#问题背景" class="headerlink" title="问题背景"></a>问题背景</h1><p>前端交互中经常使用确认框。在删除、修改等操作时，调用后端接口之前，先跳出弹框显示提示信息，提示用户确认，避免用户误操作。<br>项目中全局引入了Element，提供了一套模态对话框组件，用于消息提示、确认消息、提交内容，使用起来也非常简便。</p>
+<p>以下来自于element官网文档：</p>
+<blockquote>
+<p>如果你完整引入了 Element，它会为<code>Vue.prototype</code>添加如下全局方法：  <code>$msgbox</code>, <code>$alert</code>, <code>$confirm</code> 和<code> $prompt</code>。因此在<code>Vue instance</code>中可以采用本页面中的方式调用 MessageBox。</p>
+</blockquote>
+<p>代码范例：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="variable language_">this</span>.$confirm(<span class="string">&quot;此操作将永久删除该文件, 是否继续?&quot;</span>, <span class="string">&quot;提示&quot;</span>, &#123;</span><br><span class="line">                   <span class="attr">confirmButtonText</span>: <span class="string">&quot;确定&quot;</span>,</span><br><span class="line">                   <span class="attr">cancelButtonText</span>: <span class="string">&quot;取消&quot;</span>,</span><br><span class="line">                   <span class="attr">type</span>: <span class="string">&quot;warning&quot;</span></span><br><span class="line">               &#125;)</span><br><span class="line">                   .<span class="title function_">then</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">                       <span class="variable language_">this</span>.$message(&#123; <span class="attr">type</span>: <span class="string">&quot;success&quot;</span>, <span class="attr">message</span>: <span class="string">&quot;删除成功!&quot;</span> &#125;);</span><br><span class="line">                   &#125;)</span><br><span class="line">                   .<span class="title function_">catch</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">                       <span class="variable language_">this</span>.$message(&#123; <span class="attr">type</span>: <span class="string">&quot;info&quot;</span>, <span class="attr">message</span>: <span class="string">&quot;已取消删除&quot;</span> &#125;);</span><br><span class="line">                   &#125;);</span><br></pre></td></tr></table></figure>
+<p>Element允许复写样式，如果全局都需要，则可以进行写在全局自定义样式单中，覆盖掉原有样式。<br><strong>当Element提供的默认组件不能满足需求时，需要思考一下如何实现？</strong></p>
+<h1 id="实现尝试"><a href="#实现尝试" class="headerlink" title="实现尝试"></a>实现尝试</h1><h2 id="在单组件内部实现确认框"><a href="#在单组件内部实现确认框" class="headerlink" title="在单组件内部实现确认框"></a>在单组件内部实现确认框</h2><p>在组件内定义一个对话框，使用时将dialog显示为可见，点击确认时调用方法，点击取消&#x2F;关闭时将dialog设置为不可见。<br>在当前页面只需要一个确认框的时候，dialog的标题、内容、确认时调用的方法（<code>@click = &quot;handler&quot;</code>）都可以写死。</p>
+<ul>
+<li>怎么修改对话框内容？<br>当页面上有多个不同方法均需要对话框确认，那么el-dialog对应的数据是变动的，使用 <code>v-model</code>指令绑定一个confirmDialog对象，在触发对话框时，实时修改该对话框所显示的内容，以及按钮对应的方法。<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">el-dialog</span> <span class="attr">width</span>=<span class="string">&quot;600px&quot;</span> <span class="attr">:title</span>=<span class="string">&quot;confirmDialog.title&quot;</span> <span class="attr">:visible.sync</span>=<span class="string">&quot;confirmDialog.show&quot;</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">span</span>&gt;</span>&#123;&#123; confirmDialog.message &#125;&#125;<span class="tag">&lt;/<span class="name">span</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">div</span> <span class="attr">slot</span>=<span class="string">&quot;footer&quot;</span> <span class="attr">class</span>=<span class="string">&quot;dialog-footer&quot;</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">el-button</span> @<span class="attr">click</span>=<span class="string">&quot;confirmDialog.show = false&quot;</span>&gt;</span></span><br><span class="line">                        取 消</span><br><span class="line">                    <span class="tag">&lt;/<span class="name">el-button</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">el-button</span> <span class="attr">type</span>=<span class="string">&quot;primary&quot;</span> @<span class="attr">click</span>=<span class="string">&quot;confirmDialog.handler&quot;</span>&gt;</span></span><br><span class="line">                        确 定</span><br><span class="line">                    <span class="tag">&lt;/<span class="name">el-button</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">el-dialog</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">el-button</span> @<span class="attr">click</span> = <span class="string">&quot;&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">el-button</span>&gt;</span></span><br></pre></td></tr></table></figure>
+script中方法：<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_">deleteFile</span>(<span class="params"></span>) &#123;</span><br><span class="line">     <span class="variable language_">this</span>.<span class="property">confirmDialog</span>.<span class="property">title</span> = <span class="string">&quot;删除&quot;</span>;</span><br><span class="line">     <span class="variable language_">this</span>.<span class="property">confirmDialog</span>.<span class="property">message</span> = <span class="string">&quot;确认删除文件吗？&quot;</span>;</span><br><span class="line">     <span class="variable language_">this</span>.<span class="property">confirmDialog</span>.<span class="property">handler</span> = <span class="variable language_">this</span>.<span class="property">doDeleteFile</span>;</span><br><span class="line">     <span class="variable language_">this</span>.<span class="property">confirmDialog</span>.<span class="property">show</span> = <span class="literal">true</span>;</span><br><span class="line"> &#125;,</span><br><span class="line"> <span class="title function_">doDeleteFile</span>(<span class="params"></span>) &#123;</span><br><span class="line">     <span class="comment">// 删除文件方法</span></span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure></li>
+<li>公有部分抽取<br>在上述实现中，我们使用多个不同方法去操作同一对象，并且每个操作都需要两个方法实现，第一个方法用来修改confirmDialog的值，第二个方法用来监听确认按钮的点击事件，执行操作。<br>很容易得出，第一个方法是每个操作都类似的，可以复用的，弹窗HTML代码和样式代码也是共用的，我们将公有的部分独立成组件，就避免了重复工作。</li>
+</ul>
+<h2 id="如何抽取？"><a href="#如何抽取？" class="headerlink" title="如何抽取？"></a>如何抽取？</h2><p>由上一节，我们容易得出，需要抽取的是确认框的DOM，样式，以及数据对象。</p>
+<h3 id="为什么使用extend"><a href="#为什么使用extend" class="headerlink" title="为什么使用extend"></a>为什么使用extend</h3><blockquote>
+<p>上一章总结了子组件如何抽取，并介绍了在父组件中如何使用子组件，使用方法为：<br>在父组件中引入并注册子组件，在父组件中传入数据，为子组件的prop赋值，并在父组件中控制子组件的显示。</p>
+</blockquote>
+<p>使用父子组件 +局部注册，无需关注子组件的创建，相对来说比较简单。但是有时也会遇到问题：</p>
+<ul>
+<li>子组件的模板都是事先定义好的，如果我要从接口动态渲染组件模板怎么办？</li>
+<li>子组件都是在父组件内定义好的位置渲染，假如想要在JS代码中灵活调用，在任意地方渲染怎么办？<br>这时就轮到<code>Vue.extend()</code>出场了。</li>
+</ul>
+<h2 id="Vue-extend"><a href="#Vue-extend" class="headerlink" title="Vue.extend()"></a>Vue.extend()</h2><p><code>Vue.extend()</code>是 <code>Vue</code>框架提供的全局api，查阅官网文档，相关说明如下：<img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82ODEwNjIwLTJhNWM3NDc3NWRiNjY5NmMucG5n?x-oss-process=image/format,png" alt="vue.extend()接口说明"></p>
+<blockquote>
+<p>类比Java，可以将定义好的组件看成一个<strong>模板类</strong>，使用Vue.extend()生成该模板类的继承子类。模板类中提供了默认的变量（模板、样式、变量等），并定义了方法，在js代码中可以继承并覆盖父类的变量和方法。Vue.extend()中接收的参数相当于子类的构造参数。</p>
+</blockquote>
+<p>容易得出，我们需要传入的是对话框绑定的数据模型（data），以及点击确认后执行的方法。</p>
+<ul>
+<li>Promise<br>参考Element的做法，使用<code>ES6</code>中的<code>Promise</code>对象封装构造函数的返回，能使代码更加简洁。</li>
+</ul>
+<h1 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h1><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="title class_">Vue</span> <span class="keyword">from</span> <span class="string">&#x27;vue&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> confirm <span class="keyword">from</span> <span class="string">&#x27;../Comfirm.vue&#x27;</span>;</span><br><span class="line"><span class="keyword">let</span> confirmConstructor = <span class="title class_">Vue</span>.<span class="title function_">extend</span>(confirm);</span><br><span class="line"><span class="keyword">let</span> theConfirm = <span class="keyword">function</span> (<span class="params">content</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Promise</span>(<span class="function">(<span class="params">res, rej</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="comment">//promise封装，ok执行resolve，no执行rejectlet</span></span><br><span class="line">        <span class="keyword">let</span> confirmDom = <span class="keyword">new</span> <span class="title function_">confirmConstructor</span>(&#123;</span><br><span class="line">            <span class="attr">el</span>: <span class="variable language_">document</span>.<span class="title function_">createElement</span>(<span class="string">&#x27;div&#x27;</span>)</span><br><span class="line">        &#125;)</span><br><span class="line">        <span class="variable language_">document</span>.<span class="property">body</span>.<span class="title function_">appendChild</span>(confirmDom.<span class="property">$el</span>); <span class="comment">//new一个对象，然后插入body里面</span></span><br><span class="line">        confirmDom.<span class="property">content</span> = content; <span class="comment">//为了使confirm的扩展性更强，这个采用对象的方式传入，所有的字段都可以根据需求自定义</span></span><br><span class="line">        confirmDom.<span class="property">ok</span> = <span class="keyword">function</span> (<span class="params"></span>) &#123;</span><br><span class="line">            <span class="title function_">res</span>()</span><br><span class="line">            confirmDom.<span class="property">isShow</span> = <span class="literal">false</span></span><br><span class="line">        &#125;</span><br><span class="line">        confirmDom.<span class="property">close</span> = <span class="keyword">function</span> (<span class="params"></span>) &#123;</span><br><span class="line">            <span class="title function_">rej</span>()</span><br><span class="line">            confirmDom.<span class="property">isShow</span> = <span class="literal">false</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> theConfirm;</span><br></pre></td></tr></table></figure>
+<p>Confirm.vue</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">    &lt;!-- 自定义确认弹窗样式 --&gt;</span><br><span class="line">    &lt;el-dialog width=&quot;600px&quot; :title=&quot;content.title&quot; :visible.sync=&quot;content.show&quot; v-if=&quot;isShow&quot;&gt;</span><br><span class="line">        &lt;span&gt;&#123;&#123; content.message &#125;&#125;&lt;/span&gt;</span><br><span class="line">        &lt;div slot=&quot;footer&quot; class=&quot;dialog-footer&quot;&gt;</span><br><span class="line">            &lt;el-button @click=&quot;close&quot;&gt;</span><br><span class="line">                取 消</span><br><span class="line">            &lt;/el-button&gt;</span><br><span class="line">            &lt;el-button type=&quot;primary&quot; @click=&quot;ok&quot;&gt;</span><br><span class="line">                确 定</span><br><span class="line">            &lt;/el-button&gt;</span><br><span class="line">        &lt;/div&gt;</span><br><span class="line">    &lt;/el-dialog&gt;</span><br><span class="line"></span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">    export default &#123;</span><br><span class="line">        data() &#123;</span><br><span class="line">            return &#123;</span><br><span class="line">                // 弹窗内容</span><br><span class="line">                isShow: true,</span><br><span class="line">                content: &#123;</span><br><span class="line">                    title: &quot;&quot;,</span><br><span class="line">                    message: &quot;&quot;,</span><br><span class="line">                    data: &quot;&quot;,</span><br><span class="line">                    show: false</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;;</span><br><span class="line">        &#125;,</span><br><span class="line">        methods: &#123;</span><br><span class="line">            close() &#123;</span><br><span class="line">              </span><br><span class="line">            &#125;,</span><br><span class="line">            ok() &#123;</span><br><span class="line">   </span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">&lt;/script&gt;</span><br><span class="line"></span><br><span class="line">&lt;style&gt;</span><br><span class="line">&lt;/style&gt;</span><br></pre></td></tr></table></figure>
+<p>在main.js中引入</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> confirm <span class="keyword">from</span> <span class="string">&#x27;@/confirm.js&#x27;</span> </span><br><span class="line"><span class="title class_">Vue</span>.<span class="property"><span class="keyword">prototype</span></span>.<span class="property">$confirm</span> = confirm;</span><br></pre></td></tr></table></figure>
+<p>在任意方法中使用</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">this.$confirm(&#123; title: &quot;删除&quot;, message: &quot;确认删除该文件吗？&quot;, show: true &#125;)</span><br><span class="line">                   .then(() =&gt; &#123;</span><br><span class="line">                       //用户点击确认后执行</span><br><span class="line"></span><br><span class="line">                   &#125;)</span><br><span class="line">                   .catch(() =&gt; &#123;</span><br><span class="line">                   // 取消或关闭</span><br><span class="line">               &#125;);</span><br><span class="line">           &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>本篇主要涉及知识点：</p>
+<ul>
+<li><code>Vue.prototype</code> 为<code>Vue</code>实例添加方法</li>
+<li><code>Vue.extend()</code>使用方法</li>
+<li><code>Promise</code>对象的定义和使用<br>可复用，易扩展，易维护，是我们编程过程中应当时刻注意的原则。</li>
+</ul>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/about/">About</a></li>
+        
+          <li><a href="/archives/">Archives</a></li>
+        
+          <li><a href="/tags/">Tag</a></li>
+        
+          <li><a href="/categories/">Category</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%97%AE%E9%A2%98%E8%83%8C%E6%99%AF"><span class="toc-number">1.</span> <span class="toc-text">问题背景</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0%E5%B0%9D%E8%AF%95"><span class="toc-number">2.</span> <span class="toc-text">实现尝试</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9C%A8%E5%8D%95%E7%BB%84%E4%BB%B6%E5%86%85%E9%83%A8%E5%AE%9E%E7%8E%B0%E7%A1%AE%E8%AE%A4%E6%A1%86"><span class="toc-number">2.1.</span> <span class="toc-text">在单组件内部实现确认框</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E6%8A%BD%E5%8F%96%EF%BC%9F"><span class="toc-number">2.2.</span> <span class="toc-text">如何抽取？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BD%BF%E7%94%A8extend"><span class="toc-number">2.2.1.</span> <span class="toc-text">为什么使用extend</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Vue-extend"><span class="toc-number">2.3.</span> <span class="toc-text">Vue.extend()</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0"><span class="toc-number">3.</span> <span class="toc-text">代码实现</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">4.</span> <span class="toc-text">总结</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2020/04/28/Vue%E5%9F%BA%E7%A1%80%EF%BC%9A%E4%BD%BF%E7%94%A8Vue.extend()%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%AE%9A%E4%B9%89%E7%A1%AE%E8%AE%A4%E6%A1%86/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2020/04/28/Vue%E5%9F%BA%E7%A1%80%EF%BC%9A%E4%BD%BF%E7%94%A8Vue.extend()%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%AE%9A%E4%B9%89%E7%A1%AE%E8%AE%A4%E6%A1%86/&text=Vue基础：使用Vue.extend()实现自定义确认框"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2020/04/28/Vue%E5%9F%BA%E7%A1%80%EF%BC%9A%E4%BD%BF%E7%94%A8Vue.extend()%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%AE%9A%E4%B9%89%E7%A1%AE%E8%AE%A4%E6%A1%86/&title=Vue基础：使用Vue.extend()实现自定义确认框"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2020/04/28/Vue%E5%9F%BA%E7%A1%80%EF%BC%9A%E4%BD%BF%E7%94%A8Vue.extend()%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%AE%9A%E4%B9%89%E7%A1%AE%E8%AE%A4%E6%A1%86/&is_video=false&description=Vue基础：使用Vue.extend()实现自定义确认框"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Vue基础：使用Vue.extend()实现自定义确认框&body=Check out this article: http://example.com/2020/04/28/Vue%E5%9F%BA%E7%A1%80%EF%BC%9A%E4%BD%BF%E7%94%A8Vue.extend()%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%AE%9A%E4%B9%89%E7%A1%AE%E8%AE%A4%E6%A1%86/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2020/04/28/Vue%E5%9F%BA%E7%A1%80%EF%BC%9A%E4%BD%BF%E7%94%A8Vue.extend()%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%AE%9A%E4%B9%89%E7%A1%AE%E8%AE%A4%E6%A1%86/&title=Vue基础：使用Vue.extend()实现自定义确认框"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2020/04/28/Vue%E5%9F%BA%E7%A1%80%EF%BC%9A%E4%BD%BF%E7%94%A8Vue.extend()%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%AE%9A%E4%B9%89%E7%A1%AE%E8%AE%A4%E6%A1%86/&title=Vue基础：使用Vue.extend()实现自定义确认框"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2020/04/28/Vue%E5%9F%BA%E7%A1%80%EF%BC%9A%E4%BD%BF%E7%94%A8Vue.extend()%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%AE%9A%E4%B9%89%E7%A1%AE%E8%AE%A4%E6%A1%86/&title=Vue基础：使用Vue.extend()实现自定义确认框"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2020/04/28/Vue%E5%9F%BA%E7%A1%80%EF%BC%9A%E4%BD%BF%E7%94%A8Vue.extend()%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%AE%9A%E4%B9%89%E7%A1%AE%E8%AE%A4%E6%A1%86/&title=Vue基础：使用Vue.extend()实现自定义确认框"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2020/04/28/Vue%E5%9F%BA%E7%A1%80%EF%BC%9A%E4%BD%BF%E7%94%A8Vue.extend()%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%AE%9A%E4%B9%89%E7%A1%AE%E8%AE%A4%E6%A1%86/&name=Vue基础：使用Vue.extend()实现自定义确认框&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2020/04/28/Vue%E5%9F%BA%E7%A1%80%EF%BC%9A%E4%BD%BF%E7%94%A8Vue.extend()%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%AE%9A%E4%B9%89%E7%A1%AE%E8%AE%A4%E6%A1%86/&t=Vue基础：使用Vue.extend()实现自定义确认框"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2024
+    Ygria
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Archives</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tag</a></li><!--
+     --><!--
+       --><li><a href="/categories/">Category</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

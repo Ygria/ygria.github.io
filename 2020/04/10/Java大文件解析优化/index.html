@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="问题背景 在应用系统中，常常需要建立文件管理系统，对存储在存储组件（常用有文件存储&#x2F;数据库存储&#x2F;对象存储等）中的物理文件、目录结构在应用数据库中进行逻辑建模，从而方便查询、读取和管理。  这种设计体现了松耦合的特性，不论文件采取什么方式进行底层存储，应用层提供相同的接口，即使更换存储组件，上层接口不会改变，不影响到与其他模块的交互。应用系统为用户提供上传接口，该接口接收一个或多">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java多线程：大文件解析优化">
+<meta property="og:url" content="http://example.com/2020/04/10/Java%E5%A4%A7%E6%96%87%E4%BB%B6%E8%A7%A3%E6%9E%90%E4%BC%98%E5%8C%96/index.html">
+<meta property="og:site_name" content="孤光自照">
+<meta property="og:description" content="问题背景 在应用系统中，常常需要建立文件管理系统，对存储在存储组件（常用有文件存储&#x2F;数据库存储&#x2F;对象存储等）中的物理文件、目录结构在应用数据库中进行逻辑建模，从而方便查询、读取和管理。  这种设计体现了松耦合的特性，不论文件采取什么方式进行底层存储，应用层提供相同的接口，即使更换存储组件，上层接口不会改变，不影响到与其他模块的交互。应用系统为用户提供上传接口，该接口接收一个或多">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/6810620-77b7bdc311fbcccd.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/6810620-a01fc3ba5d5573ce.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/6810620-05a1024001494817.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="article:published_time" content="2020-04-09T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-04-16T06:16:46.575Z">
+<meta property="article:author" content="Ygria">
+<meta property="article:tag" content="编程">
+<meta property="article:tag" content="后端">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://upload-images.jianshu.io/upload_images/6810620-77b7bdc311fbcccd.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Java多线程：大文件解析优化</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Archives</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tag</a></li><!--
+     --><!--
+       --><li><a href="/categories/">Category</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2020/04/25/Vue%E5%9F%BA%E7%A1%80%EF%BC%9A%E5%AD%90%E7%BB%84%E4%BB%B6%E6%8A%BD%E5%8F%96%E4%B8%8E%E7%88%B6%E5%AD%90%E7%BB%84%E4%BB%B6%E9%80%9A%E4%BF%A1/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2018/09/10/2018_dockerNotes/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2020/04/10/Java%E5%A4%A7%E6%96%87%E4%BB%B6%E8%A7%A3%E6%9E%90%E4%BC%98%E5%8C%96/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2020/04/10/Java%E5%A4%A7%E6%96%87%E4%BB%B6%E8%A7%A3%E6%9E%90%E4%BC%98%E5%8C%96/&text=Java多线程：大文件解析优化"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2020/04/10/Java%E5%A4%A7%E6%96%87%E4%BB%B6%E8%A7%A3%E6%9E%90%E4%BC%98%E5%8C%96/&title=Java多线程：大文件解析优化"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2020/04/10/Java%E5%A4%A7%E6%96%87%E4%BB%B6%E8%A7%A3%E6%9E%90%E4%BC%98%E5%8C%96/&is_video=false&description=Java多线程：大文件解析优化"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Java多线程：大文件解析优化&body=Check out this article: http://example.com/2020/04/10/Java%E5%A4%A7%E6%96%87%E4%BB%B6%E8%A7%A3%E6%9E%90%E4%BC%98%E5%8C%96/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2020/04/10/Java%E5%A4%A7%E6%96%87%E4%BB%B6%E8%A7%A3%E6%9E%90%E4%BC%98%E5%8C%96/&title=Java多线程：大文件解析优化"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2020/04/10/Java%E5%A4%A7%E6%96%87%E4%BB%B6%E8%A7%A3%E6%9E%90%E4%BC%98%E5%8C%96/&title=Java多线程：大文件解析优化"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2020/04/10/Java%E5%A4%A7%E6%96%87%E4%BB%B6%E8%A7%A3%E6%9E%90%E4%BC%98%E5%8C%96/&title=Java多线程：大文件解析优化"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2020/04/10/Java%E5%A4%A7%E6%96%87%E4%BB%B6%E8%A7%A3%E6%9E%90%E4%BC%98%E5%8C%96/&title=Java多线程：大文件解析优化"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2020/04/10/Java%E5%A4%A7%E6%96%87%E4%BB%B6%E8%A7%A3%E6%9E%90%E4%BC%98%E5%8C%96/&name=Java多线程：大文件解析优化&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2020/04/10/Java%E5%A4%A7%E6%96%87%E4%BB%B6%E8%A7%A3%E6%9E%90%E4%BC%98%E5%8C%96/&t=Java多线程：大文件解析优化"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%97%AE%E9%A2%98%E8%83%8C%E6%99%AF"><span class="toc-number">1.</span> <span class="toc-text">问题背景</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%A7%E8%83%BD%E7%93%B6%E9%A2%88"><span class="toc-number">2.</span> <span class="toc-text">性能瓶颈</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%8B%86%E8%A7%A3%E4%BB%BB%E5%8A%A1"><span class="toc-number">3.</span> <span class="toc-text">拆解任务</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BF%AB%E9%80%9F%E5%AE%9E%E7%8E%B0"><span class="toc-number">3.1.</span> <span class="toc-text">快速实现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%94%B9%E8%BF%9B%E6%96%B9%E6%A1%88"><span class="toc-number">3.2.</span> <span class="toc-text">改进方案</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%84%E7%90%86%E7%9B%AE%E5%BD%95"><span class="toc-number">3.2.1.</span> <span class="toc-text">处理目录</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%84%E7%90%86%E6%96%87%E4%BB%B6"><span class="toc-number">3.2.2.</span> <span class="toc-text">处理文件</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Callable%E7%B1%BB"><span class="toc-number">3.2.2.1.</span> <span class="toc-text">Callable类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A4%9A%E7%BA%BF%E7%A8%8B%E6%89%A7%E8%A1%8C"><span class="toc-number">3.2.2.2.</span> <span class="toc-text">多线程执行</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AD%98%E5%82%A8"><span class="toc-number">3.2.3.</span> <span class="toc-text">存储</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="toc-number">4.</span> <span class="toc-text">注意事项</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">5.</span> <span class="toc-text">总结</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        Java多线程：大文件解析优化
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Ygria</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2020-04-09T16:00:00.000Z" class="dt-published" itemprop="datePublished">2020-04-10</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/%E5%90%8E%E7%AB%AF/" rel="tag">后端</a>, <a class="p-category" href="/tags/%E7%BC%96%E7%A8%8B/" rel="tag">编程</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h1 id="问题背景"><a href="#问题背景" class="headerlink" title="问题背景"></a>问题背景</h1><blockquote>
+<p>在应用系统中，常常需要建立文件管理系统，对存储在存储组件（常用有文件存储&#x2F;数据库存储&#x2F;对象存储等）中的物理文件、目录结构在应用数据库中进行逻辑建模，从而方便查询、读取和管理。</p>
+</blockquote>
+<p><em>这种设计体现了松耦合的特性，不论文件采取什么方式进行底层存储，应用层提供相同的接口，即使更换存储组件，上层接口不会改变，不影响到与其他模块的交互。</em><br>应用系统为用户提供上传接口，该接口接收一个或多个压缩包（*.zip），返回文件存储路径。该接口为同步响应接口，响应时间不能太长，否则前端页面会失去响应，报超时异常。<br>当用户上传一个多目录结构、包含大批量文件的压缩包，处理速度会显著下降。对文件处理过程进行效率优化，能显著提高接口响应速度，带来更好的用户体验。</p>
+<h1 id="性能瓶颈"><a href="#性能瓶颈" class="headerlink" title="性能瓶颈"></a>性能瓶颈</h1><p>当前系统采用Amazon S3对象存储组件存储物理文件，MySQL数据库存储文件信息。<br>经过测试，现有解析并存储近2万个小文件的多目录压缩包，需要5分钟。</p>
+<p>文件存储过程需要经历如下主要步骤：<br><img src="https://upload-images.jianshu.io/upload_images/6810620-77b7bdc311fbcccd.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="文件上传后主要步骤"></p>
+<p>文件存储步骤从上图可以看出，主要的时间开销为：</p>
+<ul>
+<li>向存储组件写入文件耗时</li>
+<li>建立数据库实体，写入数据库</li>
+</ul>
+<p>分析业务逻辑代码，得到如下流程图：<br><img src="https://upload-images.jianshu.io/upload_images/6810620-a01fc3ba5d5573ce.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="业务逻辑中存储逻辑"></p>
+<p>存储流程解决思路：将总任务拆解成独立、可重复执行的任务，多线程批量执行，减少与数据库交互次数。<br><strong>核心：改单线程为多线程，改单次操作为批量操作。</strong></p>
+<h1 id="拆解任务"><a href="#拆解任务" class="headerlink" title="拆解任务"></a>拆解任务</h1><p>经过分析，可以将需要处理的文件分为两类：目录和文件。<br>对于目录，只需要存储MySQL数据库记录，不需要存储至S3。<br>拆解任务的主要难点在于减少任务之间的时序依赖关系，而文件存储过程中存在的时序为：</p>
+<ul>
+<li>目录层级<br>先向数据库写入父级目录，才能写入该目录下的子文件目录或子文件，以此类推。子文件实体的parentId字段记录父目录的id，存储路径为父目录地址 + 子文件名。<br><img src="https://upload-images.jianshu.io/upload_images/6810620-05a1024001494817.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="文件实体"></li>
+</ul>
+<p> 模型如上面类图所示，数据库中不仅记录文件的大小、存储路径、类型等信息，同时保留层级结构。层级为树形，每一层目录信息需要依赖上一级而产生</p>
+<ul>
+<li>去重<br>存储路径为唯一索引，在保存记录时需要先判重，再存储。</li>
+</ul>
+<h2 id="快速实现"><a href="#快速实现" class="headerlink" title="快速实现"></a>快速实现</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">递归解析文件夹</span></span><br><span class="line"><span class="comment">**/</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">handleDir</span><span class="params">(Long parentId, String parentPath, String dirPath, List&lt;String&gt; uploadRes)</span> &#123;  </span><br><span class="line">	File[] filesAndDirs = <span class="keyword">new</span> <span class="title class_">File</span>(folderPath).listFiles();    </span><br><span class="line">	<span class="keyword">for</span> (File fileOrDir : filesAndDirs) &#123;        </span><br><span class="line">	<span class="keyword">if</span> (fileOrDir.isFile()) &#123;   </span><br><span class="line">			<span class="comment">//...向存储组件传输，并存储记录</span></span><br><span class="line">	</span><br><span class="line">  	&#125; <span class="keyword">else</span> &#123;            </span><br><span class="line">	   <span class="comment">//建立父目录的文件实体           </span></span><br><span class="line">		<span class="type">FileEntity</span> <span class="variable">fileEntity</span> <span class="operator">=</span> FileEntity.builder().parentId(parentId)</span><br><span class="line">													.path(parentPath + fileOrDir.getName()<span class="string">&quot;/&quot;</span>)                   </span><br><span class="line">													.build();</span><br><span class="line">		fileEntity = fileRepository.save(fileEntity);</span><br><span class="line">      <span class="comment">//递归调用       											     </span></span><br><span class="line">		<span class="built_in">this</span>.handleDir(fileEntity.getId(), fileEntity.getPath(), fileEntity.getPath(), uploadRes);        </span><br><span class="line">		&#125;    </span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>递归解析为单线程，该方法每次都需要执行判断逻辑，判断当前处理的是文件还是文件夹，并对每个目录文件都执行入库，再进行递归。</p>
+<h2 id="改进方案"><a href="#改进方案" class="headerlink" title="改进方案"></a>改进方案</h2><p>将根目录下所有文件和目录一次性读取至内存中</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Collection&lt;File&gt; files = FileUtils.listFilesAndDirs(<span class="keyword">new</span> </span><br><span class="line"><span class="title class_">File</span>(testPath), TrueFileFilter.INSTANCE, </span><br><span class="line">TrueFileFilter.INSTANCE);</span><br></pre></td></tr></table></figure>
+
+<h3 id="处理目录"><a href="#处理目录" class="headerlink" title="处理目录"></a>处理目录</h3><p>目录层级按照深度归类，并按深度升序排列。在存储时，先存入父目录，再存子目录。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">TreeMap&lt;Integer, List&lt;File&gt;&gt; allDirs = </span><br><span class="line">dirs.stream().collect(Collectors.groupingBy(ParseTest::getFileDeep, TreeMap::<span class="keyword">new</span>, Collectors.toList()));</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">获取目录深度</span></span><br><span class="line"><span class="comment">**/</span></span><br><span class="line"><span class="keyword">static</span> <span class="type">int</span> <span class="title function_">getFileDeep</span><span class="params">(File file)</span>&#123;    </span><br><span class="line">    <span class="type">String</span> <span class="variable">path</span> <span class="operator">=</span> file.getAbsolutePath();    </span><br><span class="line">    String[] deep = path.split(<span class="string">&quot;\\\\&quot;</span>);    </span><br><span class="line">    <span class="keyword">return</span> deep.length;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Java8特性：将List使用lambda表达式转化成TreeMap<br><em>为什么使用TreeMap？key值有序</em><br>逐层处理：<br>存储目录时，将该目录实体与源文件绝对路径的映射存入缓存HashMap中。<br>只要不是第一层，都从缓存absolutePathMap中获取信息。存储到数据库时保留文件目录信息。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 根据原文件的绝对路径，缓存该目录结构</span></span><br><span class="line"> HashMap&lt;String, FileEntity&gt; absolutePathMap = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line"> <span class="keyword">for</span> (<span class="type">int</span> dirDeep : allDir.keySet()) &#123;</span><br><span class="line">     List&lt;File&gt; dirList = allDir.get(dirDeep);</span><br><span class="line">     <span class="keyword">for</span> (File dir : dirList) &#123;</span><br><span class="line">         <span class="comment">// 获取该文件的父级目录绝对地址</span></span><br><span class="line">         <span class="type">String</span> <span class="variable">parentAbsolutePath</span> <span class="operator">=</span> dir.getAbsolutePath().substring(<span class="number">0</span>, dir.getAbsolutePath().lastIndexOf(<span class="string">&quot;\\&quot;</span>));</span><br><span class="line">         <span class="comment">// 若不是第一层级，从缓存map中取出保存好的父目录信息</span></span><br><span class="line">         <span class="keyword">if</span> (dirDeep != allDirs.firstKey()) &#123;</span><br><span class="line">             parentId = absolutePathMap.get(parentAbsolutePath).getId();</span><br><span class="line">             parentPath = absolutePathMap.get(parentAbsolutePath).getPath();</span><br><span class="line">         &#125;</span><br><span class="line">         <span class="type">FileEntity</span> <span class="variable">fileEntity</span> <span class="operator">=</span> FileEntity.builder().parentId(parentId).path(parentPath + dir.getName() + <span class="string">&quot;/&quot;</span>).build();</span><br><span class="line">     </span><br><span class="line">         fileEntity = fileRepository.save(fileEntity);</span><br><span class="line">         absolutePathMap.put(dir.getAbsolutePath(), fileEntity);</span><br><span class="line">     &#125;</span><br><span class="line"></span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>遍历完成后，所有目录结构均已存入数据库中。</p>
+<h3 id="处理文件"><a href="#处理文件" class="headerlink" title="处理文件"></a>处理文件</h3><p>剩余需要处理的是文件。文件所依赖的父目录信息已全部存入absolutePathMap中，文件和文件之间处理逻辑不存在时序依赖关系，可以引入多线程来进行分割处理。</p>
+<h4 id="Callable类"><a href="#Callable类" class="headerlink" title="Callable类"></a>Callable类</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Log4j2</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">FileHandler</span> <span class="keyword">implements</span> <span class="title class_">Callable</span>&lt;List&lt;String&gt;&gt; &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 分给本线程处理的文件</span></span><br><span class="line">    <span class="keyword">private</span> Collection&lt;File&gt; files;</span><br><span class="line">    <span class="comment">//存储父路径的地方</span></span><br><span class="line">    HashMap&lt;String, DentryDTO&gt; absolutePathMap;</span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">FileHandler</span><span class="params">(Collection&lt;File&gt; files,DentryDTO&gt; absolutePathMap)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.files = files；</span><br><span class="line">        <span class="built_in">this</span>.absolutePathMap = absolutePathMap;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> List&lt;String&gt; <span class="title function_">call</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="comment">// 处理文件</span></span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p> 将需要处理的文件和所用到的absolutePathMap通过构造方法的参数传入。</p>
+<ul>
+<li>若需要使用其他类，也通过构造参数传入。</li>
+<li>使用Callable，该线程运行后会返回Future类型，是我们需要获取该线程的回调。</li>
+</ul>
+<h4 id="多线程执行"><a href="#多线程执行" class="headerlink" title="多线程执行"></a>多线程执行</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">	List&lt;File&gt; subList;</span><br><span class="line">	<span class="type">int</span> <span class="variable">batchSize</span> <span class="operator">=</span> <span class="number">500</span>;</span><br><span class="line">   <span class="comment">// 计算运行规模（需要多少个线程）</span></span><br><span class="line">	<span class="type">int</span> <span class="variable">runSize</span> <span class="operator">=</span> ((Double) (Math.ceil(singleFiles.size() * <span class="number">1d</span> / batchSize))).intValue();</span><br><span class="line">	<span class="type">ExecutorService</span> <span class="variable">executor</span> <span class="operator">=</span> Executors.newFixedThreadPool(runSize);</span><br><span class="line">    <span class="comment">// 使用阻塞容器记录结果</span></span><br><span class="line">	BlockingQueue&lt;Future&lt;List&lt;String&gt;&gt;&gt; queue = <span class="keyword">new</span> <span class="title class_">LinkedBlockingQueue</span>&lt;&gt;();</span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; runSize; i++) &#123;</span><br><span class="line">     <span class="keyword">if</span> ((i + <span class="number">1</span>) == runSize) &#123;</span><br><span class="line">          <span class="type">int</span> <span class="variable">startIndex</span> <span class="operator">=</span> i * batchSize;</span><br><span class="line">          subList = singleFiles.subList(startIndex, singleFiles.size());</span><br><span class="line">       &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="type">int</span> <span class="variable">startIndex</span> <span class="operator">=</span> i * batchSize;</span><br><span class="line">             <span class="type">int</span> <span class="variable">endIndex</span> <span class="operator">=</span> (i + <span class="number">1</span>) * batchSize;</span><br><span class="line">             subList = singleFiles.subList(startIndex, endIndex);</span><br><span class="line">       &#125;</span><br><span class="line">      <span class="type">FileHandler</span> <span class="variable">fileHandler</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FileHandler</span>(subList,absolutePathMap);</span><br><span class="line">           Future&lt;List&lt;String&gt;&gt; res = executor.submit(fileHandler);</span><br><span class="line">           queue.add(res);</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       List&lt;String&gt; resAll = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">       <span class="type">int</span> <span class="variable">queueSize</span> <span class="operator">=</span> queue.size();</span><br><span class="line">       <span class="comment">// 循环获取结果</span></span><br><span class="line">       <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; queueSize; i++) &#123;</span><br><span class="line">           resAll.addAll(queue.take().get());</span><br><span class="line">        &#125;</span><br><span class="line">        executor.shutdown();</span><br></pre></td></tr></table></figure>
+<h3 id="存储"><a href="#存储" class="headerlink" title="存储"></a>存储</h3><p>在FileHandler中调用存储逻辑，也采用线程池方案。</p>
+<h1 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h1><p>在linux环境下运行，需要注意路径分隔符与windows系统不同。应将代码中的“\”使用File.separator代替。<br>线程数量可读取当前系统的CPU内核数量，从而容易取得更好的效率。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>在对任务进行恰当的逻辑分割后，很容易找到多线程的解决方案，充分利用CPU资源。<br>使用现有的线程池方案，避免创建过多空闲线程，能使效率更优。</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/about/">About</a></li>
+        
+          <li><a href="/archives/">Archives</a></li>
+        
+          <li><a href="/tags/">Tag</a></li>
+        
+          <li><a href="/categories/">Category</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%97%AE%E9%A2%98%E8%83%8C%E6%99%AF"><span class="toc-number">1.</span> <span class="toc-text">问题背景</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%A7%E8%83%BD%E7%93%B6%E9%A2%88"><span class="toc-number">2.</span> <span class="toc-text">性能瓶颈</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%8B%86%E8%A7%A3%E4%BB%BB%E5%8A%A1"><span class="toc-number">3.</span> <span class="toc-text">拆解任务</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BF%AB%E9%80%9F%E5%AE%9E%E7%8E%B0"><span class="toc-number">3.1.</span> <span class="toc-text">快速实现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%94%B9%E8%BF%9B%E6%96%B9%E6%A1%88"><span class="toc-number">3.2.</span> <span class="toc-text">改进方案</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%84%E7%90%86%E7%9B%AE%E5%BD%95"><span class="toc-number">3.2.1.</span> <span class="toc-text">处理目录</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%84%E7%90%86%E6%96%87%E4%BB%B6"><span class="toc-number">3.2.2.</span> <span class="toc-text">处理文件</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Callable%E7%B1%BB"><span class="toc-number">3.2.2.1.</span> <span class="toc-text">Callable类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A4%9A%E7%BA%BF%E7%A8%8B%E6%89%A7%E8%A1%8C"><span class="toc-number">3.2.2.2.</span> <span class="toc-text">多线程执行</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AD%98%E5%82%A8"><span class="toc-number">3.2.3.</span> <span class="toc-text">存储</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="toc-number">4.</span> <span class="toc-text">注意事项</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">5.</span> <span class="toc-text">总结</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2020/04/10/Java%E5%A4%A7%E6%96%87%E4%BB%B6%E8%A7%A3%E6%9E%90%E4%BC%98%E5%8C%96/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2020/04/10/Java%E5%A4%A7%E6%96%87%E4%BB%B6%E8%A7%A3%E6%9E%90%E4%BC%98%E5%8C%96/&text=Java多线程：大文件解析优化"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2020/04/10/Java%E5%A4%A7%E6%96%87%E4%BB%B6%E8%A7%A3%E6%9E%90%E4%BC%98%E5%8C%96/&title=Java多线程：大文件解析优化"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2020/04/10/Java%E5%A4%A7%E6%96%87%E4%BB%B6%E8%A7%A3%E6%9E%90%E4%BC%98%E5%8C%96/&is_video=false&description=Java多线程：大文件解析优化"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Java多线程：大文件解析优化&body=Check out this article: http://example.com/2020/04/10/Java%E5%A4%A7%E6%96%87%E4%BB%B6%E8%A7%A3%E6%9E%90%E4%BC%98%E5%8C%96/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2020/04/10/Java%E5%A4%A7%E6%96%87%E4%BB%B6%E8%A7%A3%E6%9E%90%E4%BC%98%E5%8C%96/&title=Java多线程：大文件解析优化"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2020/04/10/Java%E5%A4%A7%E6%96%87%E4%BB%B6%E8%A7%A3%E6%9E%90%E4%BC%98%E5%8C%96/&title=Java多线程：大文件解析优化"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2020/04/10/Java%E5%A4%A7%E6%96%87%E4%BB%B6%E8%A7%A3%E6%9E%90%E4%BC%98%E5%8C%96/&title=Java多线程：大文件解析优化"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2020/04/10/Java%E5%A4%A7%E6%96%87%E4%BB%B6%E8%A7%A3%E6%9E%90%E4%BC%98%E5%8C%96/&title=Java多线程：大文件解析优化"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2020/04/10/Java%E5%A4%A7%E6%96%87%E4%BB%B6%E8%A7%A3%E6%9E%90%E4%BC%98%E5%8C%96/&name=Java多线程：大文件解析优化&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2020/04/10/Java%E5%A4%A7%E6%96%87%E4%BB%B6%E8%A7%A3%E6%9E%90%E4%BC%98%E5%8C%96/&t=Java多线程：大文件解析优化"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2024
+    Ygria
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Archives</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tag</a></li><!--
+     --><!--
+       --><li><a href="/categories/">Category</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>
