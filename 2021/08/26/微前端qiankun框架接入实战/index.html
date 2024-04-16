@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="背景随着项目的演进，前端的业务架构也会变得更加庞大、复杂，并常常会出现需要模块复用的场景：1、组件复用，例如统一的导航栏、侧边栏、路由权限处理逻辑等2、模块级别复用，例如统一的用户管理模块、文档中心等3、系统级别复用，总的系统由多个系统组合而成，不同的系统可能由不同的开发团队维护、使用不同的技术栈开发。 除了代码层面复用（复制粘贴），也需要更加完善的模块和系统复用方案。引入微前端，将代码根据业务逻">
+<meta property="og:type" content="article">
+<meta property="og:title" content="微前端qiankun框架接入实战">
+<meta property="og:url" content="http://example.com/2021/08/26/%E5%BE%AE%E5%89%8D%E7%AB%AFqiankun%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%85%A5%E5%AE%9E%E6%88%98/index.html">
+<meta property="og:site_name" content="孤光自照">
+<meta property="og:description" content="背景随着项目的演进，前端的业务架构也会变得更加庞大、复杂，并常常会出现需要模块复用的场景：1、组件复用，例如统一的导航栏、侧边栏、路由权限处理逻辑等2、模块级别复用，例如统一的用户管理模块、文档中心等3、系统级别复用，总的系统由多个系统组合而成，不同的系统可能由不同的开发团队维护、使用不同的技术栈开发。 除了代码层面复用（复制粘贴），也需要更加完善的模块和系统复用方案。引入微前端，将代码根据业务逻">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/a79582d6e748fdd54a9ccc637682f4ae.png">
+<meta property="article:published_time" content="2021-08-25T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-04-16T06:33:21.285Z">
+<meta property="article:author" content="Ygria">
+<meta property="article:tag" content="编程">
+<meta property="article:tag" content="前端">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/img_convert/a79582d6e748fdd54a9ccc637682f4ae.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>微前端qiankun框架接入实战</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Archives</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tag</a></li><!--
+     --><!--
+       --><li><a href="/categories/">Category</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2021/11/23/CICD%20Jenkins%20Shared%20Libraries%20&%20Http-request%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2021/07/08/JavaScript%20ES6%20%20%E4%BD%BF%E7%94%A8%E5%B1%95%E5%BC%80%E8%BF%90%E7%AE%97%E7%AC%A6%E5%AE%8C%E6%88%90%E5%85%A8%E5%B9%B3%E5%8F%B0%E6%A0%A1%E9%AA%8C%E9%87%8D%E5%90%8D%E9%80%BB%E8%BE%91%E5%B0%81%E8%A3%85/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2021/08/26/%E5%BE%AE%E5%89%8D%E7%AB%AFqiankun%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%85%A5%E5%AE%9E%E6%88%98/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2021/08/26/%E5%BE%AE%E5%89%8D%E7%AB%AFqiankun%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%85%A5%E5%AE%9E%E6%88%98/&text=微前端qiankun框架接入实战"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2021/08/26/%E5%BE%AE%E5%89%8D%E7%AB%AFqiankun%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%85%A5%E5%AE%9E%E6%88%98/&title=微前端qiankun框架接入实战"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2021/08/26/%E5%BE%AE%E5%89%8D%E7%AB%AFqiankun%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%85%A5%E5%AE%9E%E6%88%98/&is_video=false&description=微前端qiankun框架接入实战"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=微前端qiankun框架接入实战&body=Check out this article: http://example.com/2021/08/26/%E5%BE%AE%E5%89%8D%E7%AB%AFqiankun%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%85%A5%E5%AE%9E%E6%88%98/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2021/08/26/%E5%BE%AE%E5%89%8D%E7%AB%AFqiankun%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%85%A5%E5%AE%9E%E6%88%98/&title=微前端qiankun框架接入实战"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2021/08/26/%E5%BE%AE%E5%89%8D%E7%AB%AFqiankun%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%85%A5%E5%AE%9E%E6%88%98/&title=微前端qiankun框架接入实战"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2021/08/26/%E5%BE%AE%E5%89%8D%E7%AB%AFqiankun%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%85%A5%E5%AE%9E%E6%88%98/&title=微前端qiankun框架接入实战"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2021/08/26/%E5%BE%AE%E5%89%8D%E7%AB%AFqiankun%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%85%A5%E5%AE%9E%E6%88%98/&title=微前端qiankun框架接入实战"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2021/08/26/%E5%BE%AE%E5%89%8D%E7%AB%AFqiankun%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%85%A5%E5%AE%9E%E6%88%98/&name=微前端qiankun框架接入实战&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2021/08/26/%E5%BE%AE%E5%89%8D%E7%AB%AFqiankun%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%85%A5%E5%AE%9E%E6%88%98/&t=微前端qiankun框架接入实战"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%83%8C%E6%99%AF"><span class="toc-number">1.</span> <span class="toc-text">背景</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%9E%E6%88%98%E6%AD%A5%E9%AA%A4"><span class="toc-number">2.</span> <span class="toc-text">实战步骤</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFqiankun"><span class="toc-number">2.1.</span> <span class="toc-text">什么是qiankun</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E7%AB%AF%E4%BB%A3%E7%A0%81%E6%94%B9%E9%80%A0"><span class="toc-number">2.2.</span> <span class="toc-text">前端代码改造</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BB%E5%BA%94%E7%94%A8%E6%94%B9%E9%80%A0"><span class="toc-number">2.2.1.</span> <span class="toc-text">主应用改造</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1%E3%80%81%E6%94%B9%E9%80%A0%E5%85%A5%E5%8F%A3%E6%96%87%E4%BB%B6"><span class="toc-number">2.2.1.1.</span> <span class="toc-text">1、改造入口文件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2%E3%80%81%E9%80%9A%E4%BF%A1"><span class="toc-number">2.2.1.2.</span> <span class="toc-text">2、通信</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3%E3%80%81%E6%8F%90%E4%BE%9B%E5%AD%90%E5%BA%94%E7%94%A8%E6%8C%82%E8%BD%BD%E7%9A%84%E6%A0%B9%E8%8A%82%E7%82%B9"><span class="toc-number">2.2.1.3.</span> <span class="toc-text">3、提供子应用挂载的根节点</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AD%90%E5%BA%94%E7%94%A8%E6%94%B9%E9%80%A0"><span class="toc-number">2.2.2.</span> <span class="toc-text">子应用改造</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1%E3%80%81%E5%85%A5%E5%8F%A3%E6%96%87%E4%BB%B6%E6%94%B9%E9%80%A0"><span class="toc-number">2.2.2.1.</span> <span class="toc-text">1、入口文件改造</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2%E3%80%81router%E6%94%B9%E9%80%A0"><span class="toc-number">2.2.2.2.</span> <span class="toc-text">2、router改造</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3%E3%80%81%E6%89%93%E5%8C%85%E5%9C%B0%E5%9D%80%E6%94%B9%E9%80%A0"><span class="toc-number">2.2.2.3.</span> <span class="toc-text">3、打包地址改造</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4%E3%80%81%E8%AF%B7%E6%B1%82%E6%94%B9%E9%80%A0"><span class="toc-number">2.2.2.4.</span> <span class="toc-text">4、请求改造</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%90%8E%E7%AB%AF%E4%BB%A3%E7%A0%81%E6%94%B9%E9%80%A0"><span class="toc-number">2.3.</span> <span class="toc-text">后端代码改造</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BB%E5%BA%94%E7%94%A8%E5%90%8E%E7%AB%AF"><span class="toc-number">2.3.1.</span> <span class="toc-text">主应用后端</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1%E3%80%81%E7%94%9F%E6%88%90token%EF%BC%8C%E5%B9%B6%E5%9C%A8%E8%AF%B7%E6%B1%82%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF%E6%8E%A5%E5%8F%A3%E4%B8%AD%E8%BF%94%E5%9B%9E%E7%BB%99%E5%89%8D%E7%AB%AF%EF%BC%88%E4%BD%BF%E7%94%A8OAuth2%EF%BC%89"><span class="toc-number">2.3.1.1.</span> <span class="toc-text">1、生成token，并在请求用户信息接口中返回给前端（使用OAuth2）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2%E3%80%81%E6%8F%90%E4%BE%9B%E5%86%85%E9%83%A8%E9%89%B4%E6%9D%83%E6%8E%A5%E5%8F%A3"><span class="toc-number">2.3.1.2.</span> <span class="toc-text">2、提供内部鉴权接口</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BE%AE%E5%BA%94%E7%94%A8%E5%90%8E%E7%AB%AF"><span class="toc-number">2.3.2.</span> <span class="toc-text">微应用后端</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%9A%E4%B9%89%E4%BC%98%E5%85%88%E7%BA%A7%E9%AB%98%E4%BA%8ECasFilter%E7%9A%84%E8%87%AA%E5%AE%9A%E4%B9%89%E8%BF%87%E6%BB%A4%E5%99%A8%E8%BF%9B%E8%A1%8C%E9%89%B4%E6%9D%83"><span class="toc-number">2.3.2.1.</span> <span class="toc-text">定义优先级高于CasFilter的自定义过滤器进行鉴权</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%83%A8%E7%BD%B2"><span class="toc-number">2.3.3.</span> <span class="toc-text">部署</span></a></li></ol></li></ol></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        微前端qiankun框架接入实战
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Ygria</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2021-08-25T16:00:00.000Z" class="dt-published" itemprop="datePublished">2021-08-26</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a>, <a class="p-category" href="/tags/%E7%BC%96%E7%A8%8B/" rel="tag">编程</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>随着项目的演进，前端的业务架构也会变得更加庞大、复杂，并常常会出现需要模块复用的场景：<br>1、组件复用，例如统一的导航栏、侧边栏、路由权限处理逻辑等<br>2、模块级别复用，例如统一的用户管理模块、文档中心等<br>3、系统级别复用，总的系统由多个系统组合而成，不同的系统可能由不同的开发团队维护、使用不同的技术栈开发。</p>
+<p>除了代码层面复用（复制粘贴），也需要更加完善的模块和系统复用方案。引入微前端，将代码根据业务逻辑划分至不同的项目之中进行维护，能够有效的降低维护难度，每个系统既可以独立运行、独立部署，也可以组合起来构成一个完整的系统，能够更快速地响应客户的需求。</p>
+<hr>
+<p>之前页面嵌入都使用<code>iframe</code>，简捷易用，两行代码就可以搞定，但在加载速度方面略有些不尽人意。可以看这篇➡<a target="_blank" rel="noopener" href="https://www.yuque.com/kuitos/gky7yw/gesexv">Why Not Iframe</a><br>听说隔壁项目组都已经用<code>qiankun</code>用的飞起了，我们必不能落后于人~于是在赶鸭子上架下，使用了<code>qiankun</code>进行了一次完整的实践。</p>
+<h1 id="实战步骤"><a href="#实战步骤" class="headerlink" title="实战步骤"></a>实战步骤</h1><h2 id="什么是qiankun"><a href="#什么是qiankun" class="headerlink" title="什么是qiankun"></a>什么是<code>qiankun</code></h2><p><a target="_blank" rel="noopener" href="https://qiankun.umijs.org/zh/guide">qiankun官方文档</a></p>
+<blockquote>
+<p><code>qiankun</code>是基于<code>single-spa</code>的封装，可以参考：<a target="_blank" rel="noopener" href="https://single-spa.js.org/">https://single-spa.js.org/</a> .<br><code>single-spa</code>是一个将多个单页面应用聚合为一个整体应用的 <code>JavaScript</code> 微前端框架。<br>我们每个前端项目最终都会被打包成一个单页应用，该应用以index.html为入口，在其中引入打包后的js和css文件。</p>
+</blockquote>
+<h2 id="前端代码改造"><a href="#前端代码改造" class="headerlink" title="前端代码改造"></a>前端代码改造</h2><p><code>qiankun</code>在逻辑上，将前端应用划分为主应用（又称为基座应用）和微应用，主应用拉取微应用打包后的js，并设置一定的规则来控制微应用的生命周期（装载、卸载等），微应用则要暴露出生命周期钩子函数，供主函数调用。</p>
+<p>在主应用下安装依赖:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm i qiankun --save-dev</span><br></pre></td></tr></table></figure>
+<h3 id="主应用改造"><a href="#主应用改造" class="headerlink" title="主应用改造"></a>主应用改造</h3><h4 id="1、改造入口文件"><a href="#1、改造入口文件" class="headerlink" title="1、改造入口文件"></a>1、改造入口文件</h4><p><code>mainApp/main.js</code></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; registerMicroApps, start &#125; <span class="keyword">from</span> <span class="string">&quot;qiankun&quot;</span></span><br><span class="line"><span class="keyword">let</span> msg = &#123;</span><br><span class="line">   <span class="comment">// 传入子应用的内容</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 注册子应用</span></span><br><span class="line"><span class="title function_">registerMicroApps</span>(</span><br><span class="line">    [</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">name</span>: <span class="string">&quot;turing-permission&quot;</span>,</span><br><span class="line">            <span class="attr">entry</span>: <span class="string">&quot;//127.0.0.1:9527&quot;</span>,</span><br><span class="line">            <span class="comment">//  指定子应用的挂载容器</span></span><br><span class="line">            <span class="attr">container</span>: <span class="string">&#x27;#subApp&#x27;</span>,</span><br><span class="line">            <span class="attr">activeRule</span>: <span class="string">&quot;#/turing-permission&quot;</span>,</span><br><span class="line">            <span class="attr">props</span>: msg</span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="attr">name</span>: <span class="string">&quot;turing-moss&quot;</span>,</span><br><span class="line">            <span class="attr">entry</span>: <span class="string">&quot;//127.0.0.1:9528&quot;</span>,</span><br><span class="line">            <span class="comment">//  指定子应用的挂载容器</span></span><br><span class="line">            <span class="attr">container</span>: <span class="string">&#x27;#subApp&#x27;</span>,</span><br><span class="line">            <span class="attr">activeRule</span>: <span class="string">&quot;#/turing-moss&quot;</span>,</span><br><span class="line">            <span class="attr">props</span>: msg</span><br><span class="line">        &#125;,</span><br><span class="line">    ],</span><br><span class="line"></span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">request</span> = url =&gt; &#123; <span class="keyword">return</span> <span class="title function_">fetch</span>(url, &#123; <span class="attr">referrerPolicy</span>: <span class="string">&#x27;origin-when-cross-origin&#x27;</span> &#125;) &#125;;</span><br><span class="line"><span class="title function_">start</span>(&#123; <span class="attr">prefetch</span>: <span class="literal">true</span>, <span class="attr">sandbox</span>: &#123; <span class="attr">experimentalStyleIsolation</span>: <span class="literal">true</span> &#125;, <span class="attr">fetch</span>: request &#125;);</span><br></pre></td></tr></table></figure>
+<p>说明：<br>参看<a target="_blank" rel="noopener" href="https://qiankun.umijs.org/zh/api">qiankunAPI说明文档</a></p>
+<ul>
+<li><p><code>registerMicroApps</code>方法接收子应用列表。 参数解释：<br>1、name - 子应用名称<br>2、entry - 主应用使用fetch请求，从该入口获取子应用的js、css等资源，注意该地址需要去掉协议（http&#x2F;https）。部署到线上时，该地址可填写为部署地址IP + 端口 + &#x2F;subApp的形式，使用nginx代理，后面说到部署时会给出示例。此处为本地开发时的地址。<br>3、container - 子应用挂载的DOM根节点。需要注意在子应用加载时，该DOM节点必须存在，否则会报子应用挂载失败错误<br>4、activeRule - 触发子应用挂载的条件。如果子应用使用的路由为hash模式，则需要加<code>#</code>，如果使用的是history 模式，则不需要加<code>#</code>。本次实战使用的路由模式均为hash模式（也是默认的模式）<br>该方法可以自定义方法实现<br>5、props： 可以定义主应用传入到子应用的值。可以将主应用的store和router都传过去。</p>
+</li>
+<li><p><code>start</code>方法<br>参考API文档进行配置。这里踩了一个坑，如果沙箱隔离配置为 <code>sandbox: &#123; strictStyleIsolation: true &#125;</code>,可能会导致element-UI组件样式被影响（下拉框挂到左上角）。</p>
+</li>
+</ul>
+<h4 id="2、通信"><a href="#2、通信" class="headerlink" title="2、通信"></a>2、通信</h4><p>应用在鉴权中，用于同步登录状态和传递token（若使用同一个域下的Cookie来鉴权，此处可忽略）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">import qiankunActions from &#x27;@/store/qiankun&#x27;</span><br><span class="line">//   登录成功后，获取到访问令牌</span><br><span class="line">const &#123; permissionList, accessToken &#125; = await store.dispatch(&#x27;user/getInfo&#x27;)</span><br><span class="line">qiankunActions.setGlobalState(&#123; token: accessToken &#125;);</span><br></pre></td></tr></table></figure>
+<h4 id="3、提供子应用挂载的根节点"><a href="#3、提供子应用挂载的根节点" class="headerlink" title="3、提供子应用挂载的根节点"></a>3、提供子应用挂载的根节点</h4><p><code>App.vue</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">    &lt;div id=&quot;container&quot; class=&quot;container&quot;&gt;</span><br><span class="line">        &lt;head-top v-if=&quot;$route.name != &#x27;Home&#x27;&quot; /&gt;</span><br><span class="line">        &lt;router-view /&gt;</span><br><span class="line">        &lt;div  id=&quot;subApp&quot; /&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br></pre></td></tr></table></figure>
+<p>注意：如果使用了<router-view/>，该节点需要与最高层级的<router-view>同级！</p>
+<h3 id="子应用改造"><a href="#子应用改造" class="headerlink" title="子应用改造"></a>子应用改造</h3><p>子应用无需安装qiankun依赖</p>
+<h4 id="1、入口文件改造"><a href="#1、入口文件改造" class="headerlink" title="1、入口文件改造"></a>1、入口文件改造</h4><p><code>subApp/main.js</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">let instance;</span><br><span class="line">function render(props) &#123;</span><br><span class="line">  let container = props ? props.container : undefined;</span><br><span class="line">  instance = new Vue(&#123;</span><br><span class="line">    router,</span><br><span class="line">    store,</span><br><span class="line">    render: h =&gt; h(App),</span><br><span class="line">  &#125;).$mount(container ? container.querySelector(&#x27;#app&#x27;) : &#x27;#app&#x27;);</span><br><span class="line">&#125;</span><br><span class="line">if (!window.__POWERED_BY_QIANKUN__) &#123;</span><br><span class="line">  render();</span><br><span class="line">&#125;</span><br><span class="line">export async function bootstrap() &#123; </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">export async function mount(props) &#123;</span><br><span class="line">  props.onGlobalStateChange((state, prevState) =&gt; &#123;</span><br><span class="line">    store.commit(&#x27;user/SET_TOKEN&#x27;, prevState.token)</span><br><span class="line">  &#125;, true);</span><br><span class="line">  render(props);</span><br><span class="line">&#125;</span><br><span class="line">export async function unmount() &#123;</span><br><span class="line">  console.log(&#x27;[turing-permission] unmounted&#x27;);</span><br><span class="line">  instance.$destroy();</span><br><span class="line">  instance = null;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>从代码逻辑易得，在子应用中暴露出的mount钩子方法中执行了Vue的render方法。该方法根据传入的props（会将container传入），找到对应的dom节点，在该dom节点下插入子应用的模板代码，再执行Vue的mount方法。需要区分两个mount：一个是子应用的挂载，一个是Vue应用的挂载。<br>通过<code>window.__POWERED_BY_QIANKUN__</code>，可以判断是否是被嵌入在主应用中运行。<br><code>props.onGlobalStateChange((state, prevState) =&gt; &#123;     store.commit(&#39;user/SET_TOKEN&#39;, prevState.token)   &#125;, true);</code>第二个参数是必须的，用于从主应用中获取到token。</p>
+<h4 id="2、router改造"><a href="#2、router改造" class="headerlink" title="2、router改造"></a>2、router改造</h4><p>若使用history模式，<code>mode: &#39;history&#39;</code>,需要增加<code>base: &#39;/sub-app&#39;</code><br><code>router/index.js</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">const createRouter = () =&gt;&#123;</span><br><span class="line">    // 微应用运用的路由是只读的，需要先进行全量的定义</span><br><span class="line">    let actualRoutes = window.__POWERED_BY_QIANKUN__ ?constantRoutes.concat(asyncRoutes) : constantRoutes;</span><br><span class="line">    let prefix = &quot;/sub-app&quot;;</span><br><span class="line">    //  若需要</span><br><span class="line">    if(window.__POWERED_BY_QIANKUN__)&#123;</span><br><span class="line">        actualRoutes.forEach(item =&gt; &#123;</span><br><span class="line">            item.path = prefix + item.path;</span><br><span class="line">            item.redirect = prefix + item.redirect;</span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    return new Router(&#123;</span><br><span class="line">        mode: &#x27;hash&#x27;,</span><br><span class="line">        routes: actualRoutes</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line">const router = createRouter();</span><br><span class="line">export default router</span><br></pre></td></tr></table></figure>
+<h4 id="3、打包地址改造"><a href="#3、打包地址改造" class="headerlink" title="3、打包地址改造"></a>3、打包地址改造</h4><p><code>vue.config.js</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">const &#123; name &#125; =require(`./package`);</span><br><span class="line">...</span><br><span class="line"> configureWebpack: &#123;</span><br><span class="line">    name: name,</span><br><span class="line">    resolve: &#123;</span><br><span class="line">      alias: &#123;</span><br><span class="line">        &#x27;@&#x27;: resolve(&#x27;src&#x27;)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    output: &#123;</span><br><span class="line">      // 把子应用打包成 umd 库格式</span><br><span class="line">      library: `$&#123;name&#125;-[name]`,</span><br><span class="line">      libraryTarget: &#x27;umd&#x27;,</span><br><span class="line">      jsonpFunction: `webpackJsonp_$&#123;name&#125;`,</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br></pre></td></tr></table></figure>
+<p>新增<code>public-path.js</code>，并引入到<code>main.js</code>中<br><code>src/public-path.js</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">if (window.__POWERED_BY_QIANKUN__) &#123;</span><br><span class="line">  __webpack_public_path__ = window.__INJECTED_PUBLIC_PATH_BY_QIANKUN__;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="4、请求改造"><a href="#4、请求改造" class="headerlink" title="4、请求改造"></a>4、请求改造</h4><p>1）baseUrl改造（方便之后的代理）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">let baseURL = window.__POWERED_BY_QIANKUN__ ? &#x27;/turing-moss&#x27; + process.env.VUE_APP_BASE_API : process.env.VUE_APP_BASE_API</span><br><span class="line">// 创建axios实例</span><br><span class="line">const service = axios.create(&#123;</span><br><span class="line">  baseURL: baseURL, // api的base_url</span><br><span class="line">  timeout: 300000 // 请求超时时间</span><br><span class="line">&#125;)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>鉴权请求头改造，适配改造后的鉴权方案<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">function createHeader(token, isformdata) &#123;</span><br><span class="line">  var contentType = isformdata ? &#x27;multipart/form-data&#x27; : &#x27;application/json&#x27;</span><br><span class="line">  let headers = &#123;</span><br><span class="line">    &#x27;Content-Type&#x27;: contentType,</span><br><span class="line">    &#x27;time&#x27;: new Date().getTime(),</span><br><span class="line">    &#x27;salt&#x27;: rdNum(6),</span><br><span class="line">  &#125;</span><br><span class="line">  if (window.__POWERED_BY_QIANKUN__) &#123;</span><br><span class="line">    headers.Authorization = store.getters.token</span><br><span class="line">    headers.useToken = true</span><br><span class="line">  &#125;</span><br><span class="line">  return headers;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="后端代码改造"><a href="#后端代码改造" class="headerlink" title="后端代码改造"></a>后端代码改造</h2><p>主要是鉴权改造。<br>鉴权顺序：<br>用户在主应用登录➡主应用后端生成令牌传递给前端➡前端微应用共享该令牌，在请求微应用后端时携带➡微应用后端拿到令牌后，请求主应用接口，判断是否合法，并获取用户信息</p>
+<p>原先的鉴权方案都是CAS鉴权。</p>
+<h3 id="主应用后端"><a href="#主应用后端" class="headerlink" title="主应用后端"></a>主应用后端</h3><h4 id="1、生成token，并在请求用户信息接口中返回给前端（使用OAuth2）"><a href="#1、生成token，并在请求用户信息接口中返回给前端（使用OAuth2）" class="headerlink" title="1、生成token，并在请求用户信息接口中返回给前端（使用OAuth2）"></a>1、生成token，并在请求用户信息接口中返回给前端（使用OAuth2）</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">  UserDetails userDetails = domainUserDetailsService.createSpringSecurityUser(userInfoDTO);</span><br><span class="line">                Authentication userAuth = new </span><br><span class="line">PreAuthenticatedAuthenticationToken(userDetails,userDetails.getPassword(),userDetails.getAuthorities());</span><br><span class="line">String token = tokenProvider.createToken(userAuth,true);</span><br></pre></td></tr></table></figure>
+<h4 id="2、提供内部鉴权接口"><a href="#2、提供内部鉴权接口" class="headerlink" title="2、提供内部鉴权接口"></a>2、提供内部鉴权接口</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">@GetMapping(&quot;/inner/tokenValid&quot;)</span><br><span class="line"> AuthResp validToken(String token)&#123;</span><br><span class="line">     System.out.println(token);</span><br><span class="line">     if(tokenProvider.validateToken(token))&#123;</span><br><span class="line">         Authentication authentication = tokenProvider.getAuthentication(token);</span><br><span class="line">         String accountName = authentication.getName();</span><br><span class="line">         System.out.println(authentication);</span><br><span class="line">         return AuthResp.builder().accountName(accountName)</span><br><span class="line">                 .isAuth(true).build();</span><br><span class="line">     &#125;else&#123;</span><br><span class="line">         //  权限校验失败</span><br><span class="line">         return AuthResp.builder().accountName(&quot;&quot;)</span><br><span class="line">                 .isAuth(false).build();</span><br><span class="line">     &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="微应用后端"><a href="#微应用后端" class="headerlink" title="微应用后端"></a>微应用后端</h3><h4 id="定义优先级高于CasFilter的自定义过滤器进行鉴权"><a href="#定义优先级高于CasFilter的自定义过滤器进行鉴权" class="headerlink" title="定义优先级高于CasFilter的自定义过滤器进行鉴权"></a>定义优先级高于CasFilter的自定义过滤器进行鉴权</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">@Order(0)</span><br><span class="line">@Slf4j</span><br><span class="line">@Component</span><br><span class="line">public class TokenAuthorFilter implements Filter &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    @Resource</span><br><span class="line">    UserService userService;</span><br><span class="line">    @Resource</span><br><span class="line">    AuthClient authClient</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)</span><br><span class="line">        throws IOException, ServletException &#123;</span><br><span class="line">        String accessToken = ((RequestFacade) servletRequest).getHeader(&quot;Authorization&quot;);</span><br><span class="line">        HttpSession session = ((RequestFacade) servletRequest).getSession();</span><br><span class="line">        if(((RequestFacade) servletRequest).getHeader(&quot;useToken&quot;)!=null &amp;&amp; ((RequestFacade) servletRequest).getHeader(&quot;useToken&quot;).equals(&quot;true&quot;))&#123;</span><br><span class="line">            log.info(&quot;进入微前端鉴权逻辑&quot;);</span><br><span class="line">            if(StringUtils.isNotBlank(accessToken) &amp;&amp; session.getAttribute(AbstractCasFilter.CONST_CAS_ASSERTION) == null) &#123;</span><br><span class="line">                // 能够获取到token</span><br><span class="line">               AuthResp authResp = authClient.authToken(accessToken);</span><br><span class="line">                if (authResp.getIsAuth()) &#123;</span><br><span class="line">                    String accountName = authResp.getAccountName();</span><br><span class="line">                    Assertion assertion = new AssertionImpl(accountName);</span><br><span class="line">                    session.setAttribute(AbstractCasFilter.CONST_CAS_ASSERTION, assertion);</span><br><span class="line">                    // assertion 非空：从assertion中获取数据</span><br><span class="line">                    log.debug(&quot;从permission获取当前用户信息，用户名称 = &#123;&#125;&quot;, accountName);</span><br><span class="line">                    session.setAttribute(Constants.SESSION_KEY,userService.getUserFullyByAccountName(accountName));</span><br><span class="line">                &#125;else&#123;</span><br><span class="line">                    throw new RuntimeException(&quot;qiankun主应用鉴权失败！&quot;);</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        filterChain.doFilter(servletRequest,servletResponse);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>此处逻辑：识别到携带<code>useToken</code>头的请求（此处头的名称支持自定义），请求主应用的后台，进行token的合法性校验，通过则执行后续逻辑，不通过抛出异常，前端跳转主应用的登录页。</p>
+<h3 id="部署"><a href="#部署" class="headerlink" title="部署"></a>部署</h3><p>将main.js中微应用的地址改为&#x2F;&#x2F;${IP}&#x2F;subApp的形式，使用nginx进行部署。<br>配置（配置到server 80或 443下（https）），将subAppIp设置为微服务的地址。<br><img src="https://img-blog.csdnimg.cn/img_convert/a79582d6e748fdd54a9ccc637682f4ae.png" alt="nginx配置参考"></p>
+<p>本地进行联调时，需要将proxyTable代理至微服务地址。<br>至此，接入完成。</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/about/">About</a></li>
+        
+          <li><a href="/archives/">Archives</a></li>
+        
+          <li><a href="/tags/">Tag</a></li>
+        
+          <li><a href="/categories/">Category</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%83%8C%E6%99%AF"><span class="toc-number">1.</span> <span class="toc-text">背景</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%9E%E6%88%98%E6%AD%A5%E9%AA%A4"><span class="toc-number">2.</span> <span class="toc-text">实战步骤</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFqiankun"><span class="toc-number">2.1.</span> <span class="toc-text">什么是qiankun</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E7%AB%AF%E4%BB%A3%E7%A0%81%E6%94%B9%E9%80%A0"><span class="toc-number">2.2.</span> <span class="toc-text">前端代码改造</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BB%E5%BA%94%E7%94%A8%E6%94%B9%E9%80%A0"><span class="toc-number">2.2.1.</span> <span class="toc-text">主应用改造</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1%E3%80%81%E6%94%B9%E9%80%A0%E5%85%A5%E5%8F%A3%E6%96%87%E4%BB%B6"><span class="toc-number">2.2.1.1.</span> <span class="toc-text">1、改造入口文件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2%E3%80%81%E9%80%9A%E4%BF%A1"><span class="toc-number">2.2.1.2.</span> <span class="toc-text">2、通信</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3%E3%80%81%E6%8F%90%E4%BE%9B%E5%AD%90%E5%BA%94%E7%94%A8%E6%8C%82%E8%BD%BD%E7%9A%84%E6%A0%B9%E8%8A%82%E7%82%B9"><span class="toc-number">2.2.1.3.</span> <span class="toc-text">3、提供子应用挂载的根节点</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AD%90%E5%BA%94%E7%94%A8%E6%94%B9%E9%80%A0"><span class="toc-number">2.2.2.</span> <span class="toc-text">子应用改造</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1%E3%80%81%E5%85%A5%E5%8F%A3%E6%96%87%E4%BB%B6%E6%94%B9%E9%80%A0"><span class="toc-number">2.2.2.1.</span> <span class="toc-text">1、入口文件改造</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2%E3%80%81router%E6%94%B9%E9%80%A0"><span class="toc-number">2.2.2.2.</span> <span class="toc-text">2、router改造</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3%E3%80%81%E6%89%93%E5%8C%85%E5%9C%B0%E5%9D%80%E6%94%B9%E9%80%A0"><span class="toc-number">2.2.2.3.</span> <span class="toc-text">3、打包地址改造</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4%E3%80%81%E8%AF%B7%E6%B1%82%E6%94%B9%E9%80%A0"><span class="toc-number">2.2.2.4.</span> <span class="toc-text">4、请求改造</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%90%8E%E7%AB%AF%E4%BB%A3%E7%A0%81%E6%94%B9%E9%80%A0"><span class="toc-number">2.3.</span> <span class="toc-text">后端代码改造</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BB%E5%BA%94%E7%94%A8%E5%90%8E%E7%AB%AF"><span class="toc-number">2.3.1.</span> <span class="toc-text">主应用后端</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1%E3%80%81%E7%94%9F%E6%88%90token%EF%BC%8C%E5%B9%B6%E5%9C%A8%E8%AF%B7%E6%B1%82%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF%E6%8E%A5%E5%8F%A3%E4%B8%AD%E8%BF%94%E5%9B%9E%E7%BB%99%E5%89%8D%E7%AB%AF%EF%BC%88%E4%BD%BF%E7%94%A8OAuth2%EF%BC%89"><span class="toc-number">2.3.1.1.</span> <span class="toc-text">1、生成token，并在请求用户信息接口中返回给前端（使用OAuth2）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2%E3%80%81%E6%8F%90%E4%BE%9B%E5%86%85%E9%83%A8%E9%89%B4%E6%9D%83%E6%8E%A5%E5%8F%A3"><span class="toc-number">2.3.1.2.</span> <span class="toc-text">2、提供内部鉴权接口</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BE%AE%E5%BA%94%E7%94%A8%E5%90%8E%E7%AB%AF"><span class="toc-number">2.3.2.</span> <span class="toc-text">微应用后端</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%9A%E4%B9%89%E4%BC%98%E5%85%88%E7%BA%A7%E9%AB%98%E4%BA%8ECasFilter%E7%9A%84%E8%87%AA%E5%AE%9A%E4%B9%89%E8%BF%87%E6%BB%A4%E5%99%A8%E8%BF%9B%E8%A1%8C%E9%89%B4%E6%9D%83"><span class="toc-number">2.3.2.1.</span> <span class="toc-text">定义优先级高于CasFilter的自定义过滤器进行鉴权</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%83%A8%E7%BD%B2"><span class="toc-number">2.3.3.</span> <span class="toc-text">部署</span></a></li></ol></li></ol></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2021/08/26/%E5%BE%AE%E5%89%8D%E7%AB%AFqiankun%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%85%A5%E5%AE%9E%E6%88%98/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2021/08/26/%E5%BE%AE%E5%89%8D%E7%AB%AFqiankun%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%85%A5%E5%AE%9E%E6%88%98/&text=微前端qiankun框架接入实战"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2021/08/26/%E5%BE%AE%E5%89%8D%E7%AB%AFqiankun%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%85%A5%E5%AE%9E%E6%88%98/&title=微前端qiankun框架接入实战"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2021/08/26/%E5%BE%AE%E5%89%8D%E7%AB%AFqiankun%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%85%A5%E5%AE%9E%E6%88%98/&is_video=false&description=微前端qiankun框架接入实战"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=微前端qiankun框架接入实战&body=Check out this article: http://example.com/2021/08/26/%E5%BE%AE%E5%89%8D%E7%AB%AFqiankun%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%85%A5%E5%AE%9E%E6%88%98/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2021/08/26/%E5%BE%AE%E5%89%8D%E7%AB%AFqiankun%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%85%A5%E5%AE%9E%E6%88%98/&title=微前端qiankun框架接入实战"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2021/08/26/%E5%BE%AE%E5%89%8D%E7%AB%AFqiankun%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%85%A5%E5%AE%9E%E6%88%98/&title=微前端qiankun框架接入实战"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2021/08/26/%E5%BE%AE%E5%89%8D%E7%AB%AFqiankun%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%85%A5%E5%AE%9E%E6%88%98/&title=微前端qiankun框架接入实战"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2021/08/26/%E5%BE%AE%E5%89%8D%E7%AB%AFqiankun%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%85%A5%E5%AE%9E%E6%88%98/&title=微前端qiankun框架接入实战"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2021/08/26/%E5%BE%AE%E5%89%8D%E7%AB%AFqiankun%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%85%A5%E5%AE%9E%E6%88%98/&name=微前端qiankun框架接入实战&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2021/08/26/%E5%BE%AE%E5%89%8D%E7%AB%AFqiankun%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%85%A5%E5%AE%9E%E6%88%98/&t=微前端qiankun框架接入实战"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2024
+    Ygria
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Archives</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tag</a></li><!--
+     --><!--
+       --><li><a href="/categories/">Category</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

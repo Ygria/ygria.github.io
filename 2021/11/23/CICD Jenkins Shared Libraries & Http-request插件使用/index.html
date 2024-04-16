@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="前篇：1、Jenkins的搭建和简介：https:&#x2F;&#x2F;www.jianshu.com&#x2F;p&#x2F;ca4886e117202、Jenkins Gitlab集成，使用WebHook触发构建：https:&#x2F;&#x2F;www.jianshu.com&#x2F;p&#x2F;ca4886e11720  之前我搭建的开发环境的Jenkins，经过一年多时间的积累和组内使用，已经为二十多个项目提供了部署运维环境。在需要快速迭代部署的时候，Je">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CICD Jenkins Shared Libraries &amp; Http-request插件使用">
+<meta property="og:url" content="http://example.com/2021/11/23/CICD%20Jenkins%20Shared%20Libraries%20&%20Http-request%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/index.html">
+<meta property="og:site_name" content="孤光自照">
+<meta property="og:description" content="前篇：1、Jenkins的搭建和简介：https:&#x2F;&#x2F;www.jianshu.com&#x2F;p&#x2F;ca4886e117202、Jenkins Gitlab集成，使用WebHook触发构建：https:&#x2F;&#x2F;www.jianshu.com&#x2F;p&#x2F;ca4886e11720  之前我搭建的开发环境的Jenkins，经过一年多时间的积累和组内使用，已经为二十多个项目提供了部署运维环境。在需要快速迭代部署的时候，Je">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/6d1a2e8045e8a1ce048b626d2cbd11fd.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/2b4c7d63276876ff3210447782906020.png">
+<meta property="article:published_time" content="2021-11-22T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-04-16T07:05:27.996Z">
+<meta property="article:author" content="Ygria">
+<meta property="article:tag" content="运维">
+<meta property="article:tag" content="编程">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/img_convert/6d1a2e8045e8a1ce048b626d2cbd11fd.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>CICD Jenkins Shared Libraries &amp; Http-request插件使用</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Archives</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tag</a></li><!--
+     --><!--
+       --><li><a href="/categories/">Category</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2021/12/12/Java%20%E8%AE%B0%E5%BD%95%E5%9F%BA%E4%BA%8ECAS%E7%99%BB%E5%BD%95%E6%A8%A1%E5%9D%97%E7%9A%84%E5%87%A0%E4%B8%AA%E5%AE%89%E5%85%A8%E9%97%AE%E9%A2%98%E7%9A%84%E8%A7%A3%E5%86%B3/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2021/08/26/%E5%BE%AE%E5%89%8D%E7%AB%AFqiankun%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%85%A5%E5%AE%9E%E6%88%98/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2021/11/23/CICD%20Jenkins%20Shared%20Libraries%20&amp;%20Http-request%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2021/11/23/CICD%20Jenkins%20Shared%20Libraries%20&amp;%20Http-request%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/&text=CICD Jenkins Shared Libraries &amp; Http-request插件使用"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2021/11/23/CICD%20Jenkins%20Shared%20Libraries%20&amp;%20Http-request%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/&title=CICD Jenkins Shared Libraries &amp; Http-request插件使用"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2021/11/23/CICD%20Jenkins%20Shared%20Libraries%20&amp;%20Http-request%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/&is_video=false&description=CICD Jenkins Shared Libraries &amp; Http-request插件使用"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=CICD Jenkins Shared Libraries &amp; Http-request插件使用&body=Check out this article: http://example.com/2021/11/23/CICD%20Jenkins%20Shared%20Libraries%20&amp;%20Http-request%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2021/11/23/CICD%20Jenkins%20Shared%20Libraries%20&amp;%20Http-request%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/&title=CICD Jenkins Shared Libraries &amp; Http-request插件使用"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2021/11/23/CICD%20Jenkins%20Shared%20Libraries%20&amp;%20Http-request%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/&title=CICD Jenkins Shared Libraries &amp; Http-request插件使用"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2021/11/23/CICD%20Jenkins%20Shared%20Libraries%20&amp;%20Http-request%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/&title=CICD Jenkins Shared Libraries &amp; Http-request插件使用"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2021/11/23/CICD%20Jenkins%20Shared%20Libraries%20&amp;%20Http-request%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/&title=CICD Jenkins Shared Libraries &amp; Http-request插件使用"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2021/11/23/CICD%20Jenkins%20Shared%20Libraries%20&amp;%20Http-request%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/&name=CICD Jenkins Shared Libraries &amp; Http-request插件使用&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2021/11/23/CICD%20Jenkins%20Shared%20Libraries%20&amp;%20Http-request%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/&t=CICD Jenkins Shared Libraries &amp; Http-request插件使用"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%9B%AE%E5%89%8D%E5%AD%98%E5%9C%A8%E9%97%AE%E9%A2%98"><span class="toc-number">1.</span> <span class="toc-text">目前存在问题</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Shared-Libraries-%E9%85%8D%E7%BD%AE%E5%92%8C%E4%BD%BF%E7%94%A8"><span class="toc-number">2.</span> <span class="toc-text">Shared Libraries 配置和使用</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE"><span class="toc-number">2.1.</span> <span class="toc-text">配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%84%9A%E6%9C%AC%E7%BC%96%E5%86%99"><span class="toc-number">2.2.</span> <span class="toc-text">脚本编写</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#http-request"><span class="toc-number">3.</span> <span class="toc-text">http-request</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%B0%8F%E7%BB%93"><span class="toc-number">4.</span> <span class="toc-text">小结</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        CICD Jenkins Shared Libraries &amp; Http-request插件使用
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Ygria</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2021-11-22T16:00:00.000Z" class="dt-published" itemprop="datePublished">2021-11-23</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/%E7%BC%96%E7%A8%8B/" rel="tag">编程</a>, <a class="p-category" href="/tags/%E8%BF%90%E7%BB%B4/" rel="tag">运维</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <blockquote>
+<p>前篇：<br>1、Jenkins的搭建和简介：<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/ca4886e11720">https://www.jianshu.com/p/ca4886e11720</a><br>2、Jenkins Gitlab集成，使用WebHook触发构建：<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/ca4886e11720">https://www.jianshu.com/p/ca4886e11720</a></p>
+</blockquote>
+<p>之前我搭建的开发环境的Jenkins，经过一年多时间的积累和组内使用，已经为二十多个项目提供了部署运维环境。在需要快速迭代部署的时候，Jenkins的规范化和自动化执行节约了大量的时间成本。</p>
+<h1 id="目前存在问题"><a href="#目前存在问题" class="headerlink" title="目前存在问题"></a>目前存在问题</h1><p>1、搭建流水线时，大部分步骤和代码都是可以复用的，但没有复用的方法，不得不进行大段代码的复制粘贴。<br>2、代码部署到托管平台逻辑未能解耦，如果托管平台变更，目前所有存量脚本都需要变更。<br>3、调用HTTP接口的脚本都使用<code>shell</code>中的<code>curl</code>指令实现，存在较多的转义字符和参数拼接，代码可读性较低，不容易维护，并且很容易出错，接口的请求结果也需要自己处理。</p>
+<p>经过调研，使用了公用共享库（ <code>Shared Libraries</code> ）和<code>http-request</code>插件，完美解决了这些问题。</p>
+<h1 id="Shared-Libraries-配置和使用"><a href="#Shared-Libraries-配置和使用" class="headerlink" title="Shared Libraries 配置和使用"></a>Shared Libraries 配置和使用</h1><h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p>进入Jenkins首页后，点击左侧【系统管理】；<br><img src="https://img-blog.csdnimg.cn/img_convert/6d1a2e8045e8a1ce048b626d2cbd11fd.png" alt="系统管理"><br>搜索“Global pipeline Libraries”，找到共享仓库配置。</p>
+<p>配置的地址是gitlab上的代码仓库，方便公用脚本的版本管理和维护。<br><img src="https://img-blog.csdnimg.cn/img_convert/2b4c7d63276876ff3210447782906020.png" alt="配置图"></p>
+<h2 id="脚本编写"><a href="#脚本编写" class="headerlink" title="脚本编写"></a>脚本编写</h2><p>编写规范和目录结构，参考：<a target="_blank" rel="noopener" href="https://www.jenkins.io/zh/doc/book/pipeline/shared-libraries/">https://www.jenkins.io/zh/doc/book/pipeline/shared-libraries/</a><br>以下为简单的使用示范：<br>1、在脚本代码仓库中，添加：<code>src/deploy/DeployHelper.groovy</code></p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> hello() &#123;</span><br><span class="line">    echo <span class="string">&quot;Hello World!!!!&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>2、在流水线脚本中，头部增加引入：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">@Library(&#x27;SharedLibraries&#x27;)</span><br><span class="line">import deploy.DeployHelper</span><br></pre></td></tr></table></figure>
+<p>在流水线脚本中使用：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">script &#123;</span><br><span class="line">    <span class="type">DeployHelper</span> <span class="variable">deployHelper</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">DeployHelper</span>()</span><br><span class="line">    deployHelper.hello()   </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>优点：<br>1、可以灵活使用Jenkins中已经安装的插件，不需要另外的依赖。<br>2、不需要另外给脚本授权（原本脚本在sandbox中执行，使用部分groovy公共类库时需要另外的授权。）</p>
+<h1 id="http-request"><a href="#http-request" class="headerlink" title="http-request"></a>http-request</h1><p>在脚本内部声明式地调用HTTP接口。<br><a target="_blank" rel="noopener" href="https://www.jenkins.io/doc/pipeline/steps/http_request/">https://www.jenkins.io/doc/pipeline/steps/http_request&#x2F;</a><br>使用该插件要求的Jenkins版本较高，进行了升级。由于之前配置了清华镜像，无法自动升级，选择去官网下载了安装包后，替换Jenkins内安装包，之后重启即可。<br>http-request使用较为简单，下面给出两个比较特别的范例：<br>1、上传文件（注意：multipartName 为文件参数的名称）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">def uploadBuildFile = httpRequest contentType: &#x27;APPLICATION_OCTETSTREAM&#x27;,</span><br><span class="line">           httpMode: &#x27;POST&#x27;,</span><br><span class="line">           consoleLogResponseBody: true,</span><br><span class="line">           customHeaders: [[name: &#x27;Authorization&#x27;, value: &quot;basic $&#123;token&#125;&quot;]],</span><br><span class="line">           url: &quot;http://$&#123;ip&#125;/upload/$&#123;repoName&#125;&quot;,</span><br><span class="line">           uploadFile: &quot;$&#123;filepath&#125;&quot;,</span><br><span class="line">           multipartName: &quot;files&quot;</span><br></pre></td></tr></table></figure>
+<p>2、参数payload为<code>JSONArray</code>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">import groovy.json.JsonOutput</span><br><span class="line">def restartResponse = httpRequest contentType: &#x27;APPLICATION_JSON&#x27;,</span><br><span class="line">            httpMode: &#x27;POST&#x27;,</span><br><span class="line">            consoleLogResponseBody: true,</span><br><span class="line">            url: &quot;http://$&#123;ip&#125;/status/reboot&quot;,</span><br><span class="line">            customHeaders: [[name: &#x27;Authorization&#x27;, value: &quot;basic $&#123;token&#125;&quot;]],</span><br><span class="line">            requestBody: JsonOutput.toJson([[a: &quot;$&#123;ip&#125;&quot;, b: [&quot;$&#123;serverEndpoint&#125;&quot;]]])</span><br></pre></td></tr></table></figure>
+<p> 值得注意的是，requestBody对应的参数，如果是JSONObject对应的JSONString，插件内部会自动进行反序列化，而如果是JSONArray，需要使用JsonOutput进行反序列化，不然会报参数错误。</p>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>使用共享脚本库，进一步提高了运维效率，尽量避免重复的劳动，降低了脚本的维护成本。<br>Jenkins的灵活、易于拓展可以给我们的工作带来很多方便，使用起来也是非常的有意思~</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/about/">About</a></li>
+        
+          <li><a href="/archives/">Archives</a></li>
+        
+          <li><a href="/tags/">Tag</a></li>
+        
+          <li><a href="/categories/">Category</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%9B%AE%E5%89%8D%E5%AD%98%E5%9C%A8%E9%97%AE%E9%A2%98"><span class="toc-number">1.</span> <span class="toc-text">目前存在问题</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Shared-Libraries-%E9%85%8D%E7%BD%AE%E5%92%8C%E4%BD%BF%E7%94%A8"><span class="toc-number">2.</span> <span class="toc-text">Shared Libraries 配置和使用</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE"><span class="toc-number">2.1.</span> <span class="toc-text">配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%84%9A%E6%9C%AC%E7%BC%96%E5%86%99"><span class="toc-number">2.2.</span> <span class="toc-text">脚本编写</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#http-request"><span class="toc-number">3.</span> <span class="toc-text">http-request</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%B0%8F%E7%BB%93"><span class="toc-number">4.</span> <span class="toc-text">小结</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2021/11/23/CICD%20Jenkins%20Shared%20Libraries%20&amp;%20Http-request%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2021/11/23/CICD%20Jenkins%20Shared%20Libraries%20&amp;%20Http-request%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/&text=CICD Jenkins Shared Libraries &amp; Http-request插件使用"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2021/11/23/CICD%20Jenkins%20Shared%20Libraries%20&amp;%20Http-request%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/&title=CICD Jenkins Shared Libraries &amp; Http-request插件使用"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2021/11/23/CICD%20Jenkins%20Shared%20Libraries%20&amp;%20Http-request%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/&is_video=false&description=CICD Jenkins Shared Libraries &amp; Http-request插件使用"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=CICD Jenkins Shared Libraries &amp; Http-request插件使用&body=Check out this article: http://example.com/2021/11/23/CICD%20Jenkins%20Shared%20Libraries%20&amp;%20Http-request%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2021/11/23/CICD%20Jenkins%20Shared%20Libraries%20&amp;%20Http-request%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/&title=CICD Jenkins Shared Libraries &amp; Http-request插件使用"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2021/11/23/CICD%20Jenkins%20Shared%20Libraries%20&amp;%20Http-request%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/&title=CICD Jenkins Shared Libraries &amp; Http-request插件使用"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2021/11/23/CICD%20Jenkins%20Shared%20Libraries%20&amp;%20Http-request%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/&title=CICD Jenkins Shared Libraries &amp; Http-request插件使用"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2021/11/23/CICD%20Jenkins%20Shared%20Libraries%20&amp;%20Http-request%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/&title=CICD Jenkins Shared Libraries &amp; Http-request插件使用"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2021/11/23/CICD%20Jenkins%20Shared%20Libraries%20&amp;%20Http-request%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/&name=CICD Jenkins Shared Libraries &amp; Http-request插件使用&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2021/11/23/CICD%20Jenkins%20Shared%20Libraries%20&amp;%20Http-request%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/&t=CICD Jenkins Shared Libraries &amp; Http-request插件使用"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2024
+    Ygria
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Archives</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tag</a></li><!--
+     --><!--
+       --><li><a href="/categories/">Category</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>
