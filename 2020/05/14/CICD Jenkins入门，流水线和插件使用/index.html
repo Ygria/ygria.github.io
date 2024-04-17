@@ -6,33 +6,33 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="HandheldFriendly" content="True">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-    <meta name="description" content="近，我们使用的开发服务器被回收了，换了一台新的服务器，CI&#x2F;CD平台需要重新搭建。我的运维能力一直薄弱，所以借此机会学习了一番如何使用Jenkins进行持续集成开发和部署，实践并踩了一些坑，在此记录一下。 引言假如没有CI&#x2F;CD平台 想要部署到服务器，我们需要本地打包上传至服务器，或上传源码至服务器上打包，覆盖原来的安装包，进行部署。 当所需要部署的只是一个jar包或者只是一个">
+    <meta name="description" content="最近，我们使用的开发服务器被回收了，换了一台新的服务器，CI&#x2F;CD平台需要重新搭建。我的运维能力一直薄弱，所以借此机会学习了一番如何使用Jenkins进行持续集成开发和部署，实践并踩了一些坑，在此记录一下。 引言假如没有CI&#x2F;CD平台 想要部署到服务器，我们需要本地打包上传至服务器，或上传源码至服务器上打包，覆盖原来的安装包，进行部署。 当所需要部署的只是一个jar包或者只是一">
 <meta property="og:type" content="article">
 <meta property="og:title" content="CICD：Jenkins入门，流水线和插件使用">
 <meta property="og:url" content="http://example.com/2020/05/14/CICD%20Jenkins%E5%85%A5%E9%97%A8%EF%BC%8C%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%92%8C%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/index.html">
 <meta property="og:site_name" content="孤光自照">
-<meta property="og:description" content="近，我们使用的开发服务器被回收了，换了一台新的服务器，CI&#x2F;CD平台需要重新搭建。我的运维能力一直薄弱，所以借此机会学习了一番如何使用Jenkins进行持续集成开发和部署，实践并踩了一些坑，在此记录一下。 引言假如没有CI&#x2F;CD平台 想要部署到服务器，我们需要本地打包上传至服务器，或上传源码至服务器上打包，覆盖原来的安装包，进行部署。 当所需要部署的只是一个jar包或者只是一个">
+<meta property="og:description" content="最近，我们使用的开发服务器被回收了，换了一台新的服务器，CI&#x2F;CD平台需要重新搭建。我的运维能力一直薄弱，所以借此机会学习了一番如何使用Jenkins进行持续集成开发和部署，实践并踩了一些坑，在此记录一下。 引言假如没有CI&#x2F;CD平台 想要部署到服务器，我们需要本地打包上传至服务器，或上传源码至服务器上打包，覆盖原来的安装包，进行部署。 当所需要部署的只是一个jar包或者只是一">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82ODEwNjIwLWViODJjMTZmNDFmN2I2MmQucG5n?x-oss-process=image/format,png">
-<meta property="og:image" content="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82ODEwNjIwLTA1ZTE5ZTg3MmQ0NDkwM2IucG5n?x-oss-process=image/format,png">
-<meta property="og:image" content="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82ODEwNjIwLTkyODljOTM3OTZlMTIxNTEucG5n?x-oss-process=image/format,png">
-<meta property="og:image" content="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82ODEwNjIwLTQwNTIyYTA3NzNmYWUzMWQucG5n?x-oss-process=image/format,png">
-<meta property="og:image" content="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82ODEwNjIwLWE4ODhkZGJlZTFiYmFmODMucG5n?x-oss-process=image/format,png">
-<meta property="og:image" content="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82ODEwNjIwLWFlYjA2ZDM2NmJhNDFlMzcucG5n?x-oss-process=image/format,png">
-<meta property="og:image" content="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82ODEwNjIwLWMxZDZiYjUzYjkxMGNkMmEucG5n?x-oss-process=image/format,png">
-<meta property="og:image" content="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82ODEwNjIwLTBjNjg3ZDVlYjJlNjk5MjcucG5n?x-oss-process=image/format,png">
-<meta property="og:image" content="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82ODEwNjIwLTdlNmUxYjg4MmM4NTdlYjQucG5n?x-oss-process=image/format,png">
-<meta property="og:image" content="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82ODEwNjIwLTI0MjczZDBlN2IyNDZmYjcucG5n?x-oss-process=image/format,png">
-<meta property="og:image" content="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82ODEwNjIwLWVkNGE0Y2Y4YzgxYmI3NzYucG5n?x-oss-process=image/format,png">
-<meta property="og:image" content="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82ODEwNjIwLTFiY2RkYTBlNWI4NTM4NTMucG5n?x-oss-process=image/format,png">
-<meta property="og:image" content="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82ODEwNjIwLWEzMjgwZWQxMzgwYjAwOTgucG5n?x-oss-process=image/format,png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152739.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152753.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152811.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152823.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152841.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152856.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152911.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152931.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152952.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153012.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153033.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153042.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153056.png">
 <meta property="article:published_time" content="2020-05-13T16:00:00.000Z">
-<meta property="article:modified_time" content="2024-04-17T06:02:05.577Z">
+<meta property="article:modified_time" content="2024-04-17T07:30:58.309Z">
 <meta property="article:author" content="Ygria">
 <meta property="article:tag" content="编程">
 <meta property="article:tag" content="运维">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82ODEwNjIwLWViODJjMTZmNDFmN2I2MmQucG5n?x-oss-process=image/format,png">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152739.png">
     
     
       
@@ -177,7 +177,7 @@
   
 
   <div class="content e-content" itemprop="articleBody">
-    <p>近，我们使用的开发服务器被回收了，换了一台新的服务器，CI&#x2F;CD平台需要重新搭建。<br>我的运维能力一直薄弱，所以借此机会学习了一番如何使用Jenkins进行持续集成开发和部署，实践并踩了一些坑，在此记录一下。</p>
+    <p>最近，我们使用的开发服务器被回收了，换了一台新的服务器，CI&#x2F;CD平台需要重新搭建。<br>我的运维能力一直薄弱，所以借此机会学习了一番如何使用Jenkins进行持续集成开发和部署，实践并踩了一些坑，在此记录一下。</p>
 <h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><h2 id="假如没有CI-CD平台"><a href="#假如没有CI-CD平台" class="headerlink" title="假如没有CI&#x2F;CD平台"></a>假如没有CI&#x2F;CD平台</h2><p> 想要部署到服务器，我们需要本地打包上传至服务器，或上传源码至服务器上打包，覆盖原来的安装包，进行部署。</p>
 <p>当所需要部署的只是一个jar包或者只是一个服务，并且代码不经常更新，这样是可以的。但是开发过程中，更常见的是代码经常迭代更新，并且项目中有多个组件。<br>这带来了大量的机械重复劳动，打包、上传、构建、测试、发布，如果都由人工操作，很容易混淆代码版本、不易跟踪异常。如果代码有多个分支版本，需要应对多个测试&#x2F;生产环境，劳动量会指数级别飙升，到人无法承受的地步。<br>而Jenkins提供了解决方案，使我们可以一劳永逸地应对部署。</p>
 <h1 id="Jenkins可以做什么"><a href="#Jenkins可以做什么" class="headerlink" title="Jenkins可以做什么"></a>Jenkins可以做什么</h1><p>它的流水线操作正如其名，将机械的工作流程提炼出来，重复执行，可以定义成定时操作，可以定义触发条件，可以填写参数，可以写入控制语句。<br>代替我们完成：<br>1、拉取源码至服务器（与代码管理平台直接集成，可集成gitlab&#x2F;svn等）<br>2、打包源码（可选择使用maven、nodeJS等等打包工具）<br>3、测试<br>4、准备环境<br>5、发布<br>总之，一切需要的工作，都可以定义成流水线里的一个流程。</p>
@@ -186,51 +186,61 @@
 <h2 id="2、快速开始"><a href="#2、快速开始" class="headerlink" title="2、快速开始"></a>2、快速开始</h2><ul>
 <li>创建容器</li>
 </ul>
-<p><code>docker run -d -v /jenkins_home:/var/jenkins_home -u 0 -p 8786:8080  --name jenkins jenkinszh/jenkins-zh</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -d -v /jenkins_home:/var/jenkins_home -u 0 -p 8786:8080  --name jenkins jenkinszh/jenkins-zh</span><br></pre></td></tr></table></figure>
+
 <p><strong>指令解释：</strong><br><code>-d</code>： 后台运行<br><code>-v</code>：将Jenkins主目录挂在出来<br><code>-u 0</code> ：将系统用户传入（0为root用户），避免一些权限问题<br><code>-p</code> ：指定映射到宿主机的端口，如果8786端口被占用也可以使用其他端口<br><code>--name</code>：指定运行容器名称为jenkins<br><code>jenkinszh/jenkins-zh</code> Jenkins中文社区提供的镜像名称，docker会检测本地有无该镜像，如果没有，会自动拉取。</p>
 <ul>
 <li><code>docker logs jenkins </code> 查看日志</li>
 </ul>
-<p>运行之后，访问宿主机ip+ 8786（指定端口），看到Jenkins初始页面。<br><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82ODEwNjIwLWViODJjMTZmNDFmN2I2MmQucG5n?x-oss-process=image/format,png" alt="Jenkins初始页面"></p>
+<p>运行之后，访问宿主机ip+ 8786（指定端口），看到Jenkins初始页面。<br><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152739.png" alt="image.png"></p>
 <p>Jenkins创建成功！</p>
-<h2 id="3、初始化"><a href="#3、初始化" class="headerlink" title="3、初始化"></a>3、初始化</h2><p>稍微等待之后，自动跳转至管理员登录页面。</p>
-<p><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82ODEwNjIwLTA1ZTE5ZTg3MmQ0NDkwM2IucG5n?x-oss-process=image/format,png" alt="管理员登陆页面"></p>
+<h2 id="3、初始化"><a href="#3、初始化" class="headerlink" title="3、初始化"></a>3、初始化</h2><p>稍微等待之后，自动跳转至管理员登录页面。<br><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152753.png" alt="image.png"></p>
 <p>创建容器时我们已经将该目录挂载到宿主机了，所以可以直接访问映射出的文件：<br>  <code>cat /jenkins_home/secrets/initialAdminPassword</code></p>
-<p>  也可以使用<code>docker exec</code>指令访问容器内文件:<br>  <code>docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword</code><br>输入密码，登陆进入新手入门页面。<br><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82ODEwNjIwLTkyODljOTM3OTZlMTIxNTEucG5n?x-oss-process=image/format,png" alt="新手入门"><br>选择安装推荐插件。<br>如果有安装失败的，可以点击继续，直接跳过，进入Jenkins管理页面，等待后续使用时再进行安装。<br><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82ODEwNjIwLTQwNTIyYTA3NzNmYWUzMWQucG5n?x-oss-process=image/format,png" alt="插件安装页面，因为网速原因经常失败，重试几次即可"></p>
+<p>  也可以使用<code>docker exec</code>指令访问容器内文件:<br>  <code>docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword</code><br>输入密码，登陆进入新手入门页面。</p>
+<p><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152811.png" alt="image.png"></p>
+<p>选择安装推荐插件。<br>如果有安装失败的，可以点击继续，直接跳过，进入Jenkins管理页面，等待后续使用时再进行安装。</p>
+<p><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152823.png" alt="image.png"></p>
 <h2 id="4、新建声明式流水线"><a href="#4、新建声明式流水线" class="headerlink" title="4、新建声明式流水线"></a>4、新建声明式流水线</h2><p>点击左侧新建item，可以创建新的任务，如下图所示。</p>
-<p><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82ODEwNjIwLWE4ODhkZGJlZTFiYmFmODMucG5n?x-oss-process=image/format,png" alt="创建流水线任务"></p>
+<p><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152841.png" alt="image.png"></p>
 <p>选择流水线。</p>
 <p>现在就可以创建流水线，用于部署正在开发的项目了。</p>
 <h2 id="5、常用流水线-工具-插件-使用及配置"><a href="#5、常用流水线-工具-插件-使用及配置" class="headerlink" title="5、常用流水线 + 工具 +插件 使用及配置"></a>5、常用流水线 + 工具 +插件 使用及配置</h2><p>流水线语法请参考：</p>
-<p><a target="_blank" rel="noopener" href="http://jenkins-zh.cn/wechat/articles/2020/05/2020-05-08-how-to-use-the-jenkins-declarative-pipeline/">如何使用声明式流水线</a><br>可以使用Jenkins自带的流水线语句生成工具来辅助编写：<br><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82ODEwNjIwLWFlYjA2ZDM2NmJhNDFlMzcucG5n?x-oss-process=image/format,png" alt="生成语句工具"></p>
+<p><a target="_blank" rel="noopener" href="http://jenkins-zh.cn/wechat/articles/2020/05/2020-05-08-how-to-use-the-jenkins-declarative-pipeline/">如何使用声明式流水线</a><br>可以使用Jenkins自带的流水线语句生成工具来辅助编写：</p>
+<p><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152856.png" alt="image.png"></p>
 <p>插件和其他配置均为可选，根据使用需求灵活安装。<br>在此记录一些插件&#x2F;工具，并给出它们在流水线脚本中的使用范例。</p>
 <h3 id="一、集成git-gitlab"><a href="#一、集成git-gitlab" class="headerlink" title="一、集成git&#x2F;gitlab"></a>一、集成git&#x2F;gitlab</h3><ul>
-<li>配置凭据用于登陆验证gitlab<br><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82ODEwNjIwLWMxZDZiYjUzYjkxMGNkMmEucG5n?x-oss-process=image/format,png" alt="配置凭据"></li>
-<li>参考语法<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">steps &#123;</span><br><span class="line">	git <span class="attr">branch:</span> <span class="string">&#x27;dev&#x27;</span>, <span class="attr">credentialsId:</span> <span class="string">&#x27;***&#x27;</span>, <span class="attr">url:</span> <span class="string">&#x27;https://git.***.git&#x27;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-将创建好的凭据填入。</li>
+<li><p>配置凭据用于登陆验证gitlab<br><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152911.png" alt="image.png"></p>
+</li>
+<li><p>参考语法</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">steps &#123;</span><br><span class="line">	git <span class="attr">branch:</span> <span class="string">&#x27;dev&#x27;</span>, <span class="attr">credentialsId:</span> <span class="string">&#x27;***&#x27;</span>, <span class="attr">url:</span> <span class="string">&#x27;https://git.***.git&#x27;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>将创建好的凭据填入。</p>
+</li>
 </ul>
 <h3 id="二、maven-nodeJS等构建工具使用"><a href="#二、maven-nodeJS等构建工具使用" class="headerlink" title="二、maven&#x2F;nodeJS等构建工具使用"></a>二、maven&#x2F;nodeJS等构建工具使用</h3><ul>
-<li><p>工具安装和配置<br> 在全局工具配置中配置NodeJS和Maven<br><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82ODEwNjIwLTBjNjg3ZDVlYjJlNjk5MjcucG5n?x-oss-process=image/format,png" alt="工具配置，指定环境变量"></p>
+<li><p>工具安装和配置<br> 在全局工具配置中配置NodeJS和Maven<br><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152931.png" alt="image.png"></p>
 </li>
 <li><p>使用maven打包</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">steps &#123;</span><br><span class="line">    script &#123;</span><br><span class="line">     sh &quot;mvn clean install -Dmaven.test.skip=true -Plinux&quot;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure></li>
-<li><p>使用<code>ln -s</code>指令支持脚本中运行<br>若执行时报错无mvn指令（或npm、cnpm等），说明jenkins在&#x2F;usr&#x2F;local&#x2F;bin目录下没有找到相应的指令。可以通过建立软连接方式实现支持。<br><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82ODEwNjIwLTdlNmUxYjg4MmM4NTdlYjQucG5n?x-oss-process=image/format,png" alt="/usr/local/bin下的软连接"><br>可以将宿主机的工具包直接放入挂载目录，进行映射，也可以在工具配置中选择自动下载，在Jenkins内中再次安装。</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">steps &#123;</span><br><span class="line">    script &#123;</span><br><span class="line">     sh <span class="string">&quot;mvn clean install -Dmaven.test.skip=true -Plinux&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure></li>
+<li><p>使用<code>ln -s</code>指令支持脚本中运行<br>若执行时报错无mvn指令（或npm、cnpm等），说明jenkins在&#x2F;usr&#x2F;local&#x2F;bin目录下没有找到相应的指令。可以通过建立软连接方式实现支持。<br><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152952.png" alt="image.png"></p>
 </li>
 </ul>
+<p>可以将宿主机的工具包直接放入挂载目录，进行映射，也可以在工具配置中选择自动下载，在Jenkins内中再次安装。</p>
 <h3 id="三、连接其他机器-执行脚本"><a href="#三、连接其他机器-执行脚本" class="headerlink" title="三、连接其他机器&#x2F;执行脚本"></a>三、连接其他机器&#x2F;执行脚本</h3><ul>
-<li>容器内<br>直接使用下列流水线语言格式即可。<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">script &#123;</span><br><span class="line">    sh &quot;***&quot;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></li>
+<li>容器内<br>直接使用下列流水线语言格式即可。<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">script &#123;</span><br><span class="line">    sh <span class="string">&quot;***&quot;</span></span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></li>
 <li>执行宿主机内脚本<br>（1）挂载进入容器内部<br>缺点：若脚本运行环境和操作内容是宿主机文件，该方法无法实现。<br>（2）使用ssh</li>
 <li>语句使用<br>开启免密校验，使用<code> sh &quot;ssh -o StrictHostKeyChecking=no -l root $&#123;IP&#125; &#39;****&#39;&quot;</code>格式的指令。<br>注意指令格式为双引号内套单引号，单引号内为希望在宿主机执行的指令</li>
 <li>插件使用</li>
 </ul>
 <ul>
 <li><p><strong>SSH Pipeline Step</strong><br>根据示例，可得，事先添加好凭据之后，很容易在指定ip上（包括宿主机）执行文件传输、脚本执行等操作。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">def host = [:]</span><br><span class="line">host.name = &quot;host&quot;</span><br><span class="line">host.host = &quot;&quot;</span><br><span class="line">host.allowAnyHosts = true</span><br><span class="line"> </span><br><span class="line">node &#123;</span><br><span class="line">    withCredentials([usernamePassword(credentialsId: &#x27;&#x27;, passwordVariable: &#x27;password&#x27;, usernameVariable: &#x27;userName&#x27;)]) &#123;</span><br><span class="line">        host.user = userName</span><br><span class="line">        host.password = password</span><br><span class="line">        stage(&quot;SSH Steps Rocks!&quot;) &#123;</span><br><span class="line">            writeFile file: &#x27;test.sh&#x27;, text: &#x27;ls&#x27;</span><br><span class="line">            sshCommand remote: host, command: &#x27;for i in &#123;1..5&#125;; do echo -n \&quot;Loop \$i \&quot;; date ; sleep 1; done&#x27;</span><br><span class="line">            sshScript remote: host, script: &#x27;test.sh&#x27;</span><br><span class="line">            sshPut remote: host, from: &#x27;test.sh&#x27;, into: &#x27;.&#x27;</span><br><span class="line">            sshGet remote: host, from: &#x27;test.sh&#x27;, into: &#x27;test_new.sh&#x27;, override: true</span><br><span class="line">            sshRemove remote: host, path: &#x27;test.sh&#x27;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>构建结果<br><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82ODEwNjIwLTI0MjczZDBlN2IyNDZmYjcucG5n?x-oss-process=image/format,png" alt="构建结果"></p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> host = [:]</span><br><span class="line">host.name = <span class="string">&quot;host&quot;</span></span><br><span class="line">host.host = <span class="string">&quot;&quot;</span></span><br><span class="line">host.allowAnyHosts = <span class="literal">true</span></span><br><span class="line"> </span><br><span class="line">node &#123;</span><br><span class="line">    withCredentials([usernamePassword(<span class="attr">credentialsId:</span> <span class="string">&#x27;&#x27;</span>, <span class="attr">passwordVariable:</span> <span class="string">&#x27;password&#x27;</span>, <span class="attr">usernameVariable:</span> <span class="string">&#x27;userName&#x27;</span>)]) &#123;</span><br><span class="line">        host.user = userName</span><br><span class="line">        host.password = password</span><br><span class="line">        stage(<span class="string">&quot;SSH Steps Rocks!&quot;</span>) &#123;</span><br><span class="line">            writeFile <span class="attr">file:</span> <span class="string">&#x27;test.sh&#x27;</span>, <span class="attr">text:</span> <span class="string">&#x27;ls&#x27;</span></span><br><span class="line">            sshCommand <span class="attr">remote:</span> host, <span class="attr">command:</span> <span class="string">&#x27;for i in &#123;1..5&#125;; do echo -n \&quot;Loop \$i \&quot;; date ; sleep 1; done&#x27;</span></span><br><span class="line">            sshScript <span class="attr">remote:</span> host, <span class="attr">script:</span> <span class="string">&#x27;test.sh&#x27;</span></span><br><span class="line">            sshPut <span class="attr">remote:</span> host, <span class="attr">from:</span> <span class="string">&#x27;test.sh&#x27;</span>, <span class="attr">into:</span> <span class="string">&#x27;.&#x27;</span></span><br><span class="line">            sshGet <span class="attr">remote:</span> host, <span class="attr">from:</span> <span class="string">&#x27;test.sh&#x27;</span>, <span class="attr">into:</span> <span class="string">&#x27;test_new.sh&#x27;</span>, <span class="attr">override:</span> <span class="literal">true</span></span><br><span class="line">            sshRemove <span class="attr">remote:</span> host, <span class="attr">path:</span> <span class="string">&#x27;test.sh&#x27;</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>构建结果<br><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153012.png" alt="image.png"></p>
 </li>
-<li><p><strong>Publish Over SSH</strong><br><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82ODEwNjIwLWVkNGE0Y2Y4YzgxYmI3NzYucG5n?x-oss-process=image/format,png" alt="安装Publish Over SSH插件"><br>在Jenkins管理&#x2F;系统管理&#x2F;PublishOverSSH的相关配置中配置所需要的宿主机IP、用户、密码等等信息<br><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82ODEwNjIwLTFiY2RkYTBlNWI4NTM4NTMucG5n?x-oss-process=image/format,png" alt="配置SSH Server"><br>可以在展开的高级设置中配置SSH服务器。<br>查看<a href="%5Bhttps://plugins.jenkins.io/publish-over-ssh/%5D(https://plugins.jenkins.io/publish-over-ssh/)">Publish-Over-Server 插件说明</a>获取高级用法。</p>
+<li><p><strong>Publish Over SSH</strong><br><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153033.png" alt="image.png"></p>
 </li>
 </ul>
+<p>在Jenkins管理&#x2F;系统管理&#x2F;PublishOverSSH的相关配置中配置所需要的宿主机IP、用户、密码等等信息<br><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153042.png" alt="image.png"></p>
+<p>可以在展开的高级设置中配置SSH服务器。<br>查看<a href="%5Bhttps://plugins.jenkins.io/publish-over-ssh/%5D(https://plugins.jenkins.io/publish-over-ssh/)">Publish-Over-Server 插件说明</a>获取高级用法。</p>
 <h3 id="四、集成docker"><a href="#四、集成docker" class="headerlink" title="四、集成docker"></a>四、集成docker</h3><p>因为我们的Jenkins服务是作为docker容器运行的，所以需要在容器内调用docker命令。<br>容器内调用docker命令有两种：</p>
 <ul>
 <li><p>DinD（Docker in Docker）（不推荐）<br>容器内部再安装一个Docker应用。但是这种方法不推荐，参考：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/27208085">使用 Docker-in-Docker 来运行 CI 或集成测试环境？三思！</a></p>
@@ -247,7 +257,7 @@
 </ul>
 <h3 id="五、生成归档文件"><a href="#五、生成归档文件" class="headerlink" title="五、生成归档文件"></a>五、生成归档文件</h3><p>示例：</p>
 <figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">pipeline &#123;</span><br><span class="line">    </span><br><span class="line">    agent any</span><br><span class="line"></span><br><span class="line"> stages &#123;</span><br><span class="line">     </span><br><span class="line">     stage(<span class="string">&quot;build&quot;</span>)&#123;</span><br><span class="line">         steps&#123;</span><br><span class="line">             sh <span class="string">&#x27;touch archive.jar&#x27;</span></span><br><span class="line">         &#125;</span><br><span class="line">         </span><br><span class="line">     &#125;</span><br><span class="line">     </span><br><span class="line">     stage(<span class="string">&#x27;archive&#x27;</span>) &#123;  </span><br><span class="line">            steps &#123;</span><br><span class="line">                archiveArtifacts <span class="attr">artifacts:</span> <span class="string">&#x27;archive.jar&#x27;</span>, <span class="attr">fingerprint:</span> <span class="literal">true</span> </span><br><span class="line">            &#125;</span><br><span class="line">    &#125;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>在build过程中生成归档文件，在archive过程中归档。<br><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQtaW1hZ2VzLmppYW5zaHUuaW8vdXBsb2FkX2ltYWdlcy82ODEwNjIwLWEzMjgwZWQxMzgwYjAwOTgucG5n?x-oss-process=image/format,png" alt="运行结果"></p>
+<p>在build过程中生成归档文件，在archive过程中归档。<br><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153056.png" alt="image.png"></p>
 <p>在此页面上可以直接下载归档好的文件。</p>
 <h1 id="其他（待补充）"><a href="#其他（待补充）" class="headerlink" title="其他（待补充）"></a>其他（待补充）</h1><p>1、配置时区<br>打开系统管理&#x2F;命令行，运行：<br><code>System.setProperty(&#39;org.apache.commons.jelly.tags.fmt.timeZone&#39;, &#39;Asia/Shanghai&#39;)</code></p>
 
