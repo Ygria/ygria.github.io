@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="背景在应用系统中创建业务对象时，需要填写表单，对于对象的名称、标识等，全平台往往有统一的功能规范。例如：  名称：统一为中文、不超过50字符、不能为空、不能与现有平台重复 标识：统一为英文，不超过50字符、不能为空、不能与现有平台重复交互逻辑一致（填写名称&#x2F;标识后，调用后台接口进行判断，后台查询数据库后，返回是否存在重名数据（true&#x2F;false）,存在重复则报表单校验错误，不允许表单提">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JavaScript ES6  使用展开运算符完成全平台校验重名逻辑封装">
+<meta property="og:url" content="http://example.com/2021/07/08/JavaScript%20ES6%20%20%E4%BD%BF%E7%94%A8%E5%B1%95%E5%BC%80%E8%BF%90%E7%AE%97%E7%AC%A6%E5%AE%8C%E6%88%90%E5%85%A8%E5%B9%B3%E5%8F%B0%E6%A0%A1%E9%AA%8C%E9%87%8D%E5%90%8D%E9%80%BB%E8%BE%91%E5%B0%81%E8%A3%85/index.html">
+<meta property="og:site_name" content="孤光自照">
+<meta property="og:description" content="背景在应用系统中创建业务对象时，需要填写表单，对于对象的名称、标识等，全平台往往有统一的功能规范。例如：  名称：统一为中文、不超过50字符、不能为空、不能与现有平台重复 标识：统一为英文，不超过50字符、不能为空、不能与现有平台重复交互逻辑一致（填写名称&#x2F;标识后，调用后台接口进行判断，后台查询数据库后，返回是否存在重名数据（true&#x2F;false）,存在重复则报表单校验错误，不允许表单提">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2021-07-07T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-04-16T16:17:25.000Z">
+<meta property="article:author" content="Ygria">
+<meta property="article:tag" content="编程">
+<meta property="article:tag" content="前端">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>JavaScript ES6  使用展开运算符完成全平台校验重名逻辑封装</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">archives</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tag</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2021/08/26/%E5%BE%AE%E5%89%8D%E7%AB%AFqiankun%E6%A1%86%E6%9E%B6%E6%8E%A5%E5%85%A5%E5%AE%9E%E6%88%98/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2021/05/21/Vue%20%E6%8C%87%E4%BB%A4%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%8A%A8%E5%A1%AB%E5%85%85%E8%8B%B1%E6%96%87%E5%90%8D%E5%8A%9F%E8%83%BD/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2021/07/08/JavaScript%20ES6%20%20%E4%BD%BF%E7%94%A8%E5%B1%95%E5%BC%80%E8%BF%90%E7%AE%97%E7%AC%A6%E5%AE%8C%E6%88%90%E5%85%A8%E5%B9%B3%E5%8F%B0%E6%A0%A1%E9%AA%8C%E9%87%8D%E5%90%8D%E9%80%BB%E8%BE%91%E5%B0%81%E8%A3%85/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2021/07/08/JavaScript%20ES6%20%20%E4%BD%BF%E7%94%A8%E5%B1%95%E5%BC%80%E8%BF%90%E7%AE%97%E7%AC%A6%E5%AE%8C%E6%88%90%E5%85%A8%E5%B9%B3%E5%8F%B0%E6%A0%A1%E9%AA%8C%E9%87%8D%E5%90%8D%E9%80%BB%E8%BE%91%E5%B0%81%E8%A3%85/&text=JavaScript ES6  使用展开运算符完成全平台校验重名逻辑封装"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2021/07/08/JavaScript%20ES6%20%20%E4%BD%BF%E7%94%A8%E5%B1%95%E5%BC%80%E8%BF%90%E7%AE%97%E7%AC%A6%E5%AE%8C%E6%88%90%E5%85%A8%E5%B9%B3%E5%8F%B0%E6%A0%A1%E9%AA%8C%E9%87%8D%E5%90%8D%E9%80%BB%E8%BE%91%E5%B0%81%E8%A3%85/&title=JavaScript ES6  使用展开运算符完成全平台校验重名逻辑封装"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2021/07/08/JavaScript%20ES6%20%20%E4%BD%BF%E7%94%A8%E5%B1%95%E5%BC%80%E8%BF%90%E7%AE%97%E7%AC%A6%E5%AE%8C%E6%88%90%E5%85%A8%E5%B9%B3%E5%8F%B0%E6%A0%A1%E9%AA%8C%E9%87%8D%E5%90%8D%E9%80%BB%E8%BE%91%E5%B0%81%E8%A3%85/&is_video=false&description=JavaScript ES6  使用展开运算符完成全平台校验重名逻辑封装"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=JavaScript ES6  使用展开运算符完成全平台校验重名逻辑封装&body=Check out this article: http://example.com/2021/07/08/JavaScript%20ES6%20%20%E4%BD%BF%E7%94%A8%E5%B1%95%E5%BC%80%E8%BF%90%E7%AE%97%E7%AC%A6%E5%AE%8C%E6%88%90%E5%85%A8%E5%B9%B3%E5%8F%B0%E6%A0%A1%E9%AA%8C%E9%87%8D%E5%90%8D%E9%80%BB%E8%BE%91%E5%B0%81%E8%A3%85/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2021/07/08/JavaScript%20ES6%20%20%E4%BD%BF%E7%94%A8%E5%B1%95%E5%BC%80%E8%BF%90%E7%AE%97%E7%AC%A6%E5%AE%8C%E6%88%90%E5%85%A8%E5%B9%B3%E5%8F%B0%E6%A0%A1%E9%AA%8C%E9%87%8D%E5%90%8D%E9%80%BB%E8%BE%91%E5%B0%81%E8%A3%85/&title=JavaScript ES6  使用展开运算符完成全平台校验重名逻辑封装"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2021/07/08/JavaScript%20ES6%20%20%E4%BD%BF%E7%94%A8%E5%B1%95%E5%BC%80%E8%BF%90%E7%AE%97%E7%AC%A6%E5%AE%8C%E6%88%90%E5%85%A8%E5%B9%B3%E5%8F%B0%E6%A0%A1%E9%AA%8C%E9%87%8D%E5%90%8D%E9%80%BB%E8%BE%91%E5%B0%81%E8%A3%85/&title=JavaScript ES6  使用展开运算符完成全平台校验重名逻辑封装"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2021/07/08/JavaScript%20ES6%20%20%E4%BD%BF%E7%94%A8%E5%B1%95%E5%BC%80%E8%BF%90%E7%AE%97%E7%AC%A6%E5%AE%8C%E6%88%90%E5%85%A8%E5%B9%B3%E5%8F%B0%E6%A0%A1%E9%AA%8C%E9%87%8D%E5%90%8D%E9%80%BB%E8%BE%91%E5%B0%81%E8%A3%85/&title=JavaScript ES6  使用展开运算符完成全平台校验重名逻辑封装"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2021/07/08/JavaScript%20ES6%20%20%E4%BD%BF%E7%94%A8%E5%B1%95%E5%BC%80%E8%BF%90%E7%AE%97%E7%AC%A6%E5%AE%8C%E6%88%90%E5%85%A8%E5%B9%B3%E5%8F%B0%E6%A0%A1%E9%AA%8C%E9%87%8D%E5%90%8D%E9%80%BB%E8%BE%91%E5%B0%81%E8%A3%85/&title=JavaScript ES6  使用展开运算符完成全平台校验重名逻辑封装"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2021/07/08/JavaScript%20ES6%20%20%E4%BD%BF%E7%94%A8%E5%B1%95%E5%BC%80%E8%BF%90%E7%AE%97%E7%AC%A6%E5%AE%8C%E6%88%90%E5%85%A8%E5%B9%B3%E5%8F%B0%E6%A0%A1%E9%AA%8C%E9%87%8D%E5%90%8D%E9%80%BB%E8%BE%91%E5%B0%81%E8%A3%85/&name=JavaScript ES6  使用展开运算符完成全平台校验重名逻辑封装&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2021/07/08/JavaScript%20ES6%20%20%E4%BD%BF%E7%94%A8%E5%B1%95%E5%BC%80%E8%BF%90%E7%AE%97%E7%AC%A6%E5%AE%8C%E6%88%90%E5%85%A8%E5%B9%B3%E5%8F%B0%E6%A0%A1%E9%AA%8C%E9%87%8D%E5%90%8D%E9%80%BB%E8%BE%91%E5%B0%81%E8%A3%85/&t=JavaScript ES6  使用展开运算符完成全平台校验重名逻辑封装"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%83%8C%E6%99%AF"><span class="toc-number">1.</span> <span class="toc-text">背景</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%B1%95%E5%BC%80%EF%BC%88spread%EF%BC%89%E8%BF%90%E7%AE%97%E7%AC%A6"><span class="toc-number">2.</span> <span class="toc-text">展开（spread）运算符</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%A0%A1%E9%AA%8C%E9%80%BB%E8%BE%91%E6%96%B9%E6%B3%95%E5%AE%9A%E4%B9%89"><span class="toc-number">3.</span> <span class="toc-text">校验逻辑方法定义</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%A1%E9%AA%8C%E5%87%BD%E6%95%B0%E5%B0%81%E8%A3%85"><span class="toc-number">3.1.</span> <span class="toc-text">校验函数封装</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8"><span class="toc-number">4.</span> <span class="toc-text">使用</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%B0%8F%E7%BB%93"><span class="toc-number">5.</span> <span class="toc-text">小结</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        JavaScript ES6  使用展开运算符完成全平台校验重名逻辑封装
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Ygria</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2021-07-07T16:00:00.000Z" class="dt-published" itemprop="datePublished">2021-07-08</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a>, <a class="p-category" href="/tags/%E7%BC%96%E7%A8%8B/" rel="tag">编程</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>在应用系统中创建业务对象时，需要填写表单，对于对象的名称、标识等，全平台往往有统一的功能规范。<br>例如：</p>
+<ul>
+<li>名称：统一为中文、不超过50字符、不能为空、不能与现有平台重复</li>
+<li>标识：统一为英文，不超过50字符、不能为空、不能与现有平台重复<br>交互逻辑一致（填写名称&#x2F;标识后，调用后台接口进行判断，后台查询数据库后，返回是否存在重名数据（<code>true/false</code>）,存在重复则报表单校验错误，不允许表单提交），前端使用的组件也一致（使用<code>element-UI</code>的<code>Form</code>组件），公共逻辑清晰，于是我尝试进行统一的<strong>规则校验逻辑</strong>方法封装，简化了大量重复代码，在使用时用**展开运算符<code>spread(...)</code>**进行引入，保证了代码的优雅和简洁。</li>
+</ul>
+<h1 id="展开（spread）运算符"><a href="#展开（spread）运算符" class="headerlink" title="展开（spread）运算符"></a>展开（spread）运算符</h1><p>展开运算符是<code>JavaScript ES6</code>的特性，可以用于数组、字符串、对象的解构赋值。<br>具体使用逻辑请参考：<a target="_blank" rel="noopener" href="https://github.com/ruanyf/es6tutorial/blob/3929f4f21148dcd2a10d2ebc722323a5dbd473f4/docs/array.md">扩展运算符</a></p>
+<h1 id="校验逻辑方法定义"><a href="#校验逻辑方法定义" class="headerlink" title="校验逻辑方法定义"></a>校验逻辑方法定义</h1><h2 id="校验函数封装"><a href="#校验函数封装" class="headerlink" title="校验函数封装"></a>校验函数封装</h2><p>定义方法入参：<br>1、资源英文名称<br>用于拼接调用后端<code>RESTful</code>接口，例如：校验应用重复，后端定义接口URI为：<br><code>/api/applications/nameOrKeyExisted</code>，此时资源英文名称为<code>applications</code><br>2、资源中文名<br>用于页面提示回显，例如：表单中应用名称没有填写，提示：“请填写应用名称”，应用名称已存在，提示：“应用名称重复”，此时资源中文名为“应用”<br>3、附加参数</p>
+<ul>
+<li>有些资源限定为某类型下不能重复，或某个领域内不能重复，在调用判重接口时需要传递给后端。</li>
+<li>prop参数，用于表单绑定的<code>prop</code>定义，如果不传，默认为name和key，允许传入自定义值。<br>方法前端源码（定义在通用的<code>util.js</code>中，在Vue工程中可以在<code>main.js</code>引入到全局中。）</li>
+</ul>
+<p>定义方法返回：<br>返回对象，对象中，键对应表单 <code>prop</code>属性，值是一个数组，包括多种规则（特殊字符校验、非空校验、重名校验等）<br>utils.js：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * @entity 校验实体资源</span><br><span class="line"> * @entityName 校验实体中文名</span><br><span class="line"> * @options  调用校验接口，额外参数传递</span><br><span class="line"> */</span><br><span class="line">function getRules(entity, entityName,options) &#123;</span><br><span class="line">  let name = options?.nameProp || &#x27;name&#x27;</span><br><span class="line">  let key = options?.keyProp || &#x27;key&#x27;</span><br><span class="line">  let rules = &#123;&#125;;</span><br><span class="line">  rules[name] = validateRules(</span><br><span class="line">    &#x27;name&#x27;,</span><br><span class="line">    entity,</span><br><span class="line">    entityName,</span><br><span class="line">    options?.params</span><br><span class="line">  );</span><br><span class="line">  rules[key] = validateRules(</span><br><span class="line">    &#x27;key&#x27;,</span><br><span class="line">    entity,</span><br><span class="line">    entityName,</span><br><span class="line">    options?.params</span><br><span class="line">  );</span><br><span class="line">  return rules;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line">function validateRules(field, entity, entityName,extraParams) &#123;</span><br><span class="line">  let rules = [];</span><br><span class="line"></span><br><span class="line">  let requiredRule = &#123;</span><br><span class="line">    required: true,</span><br><span class="line">    message: `请输入$&#123;entityName&#125;$&#123;field === &#x27;key&#x27; ? &#x27;标识&#x27; : &#x27;名称&#x27;&#125;`,</span><br><span class="line">    trigger: &quot;blur&quot;,</span><br><span class="line">  &#125;;</span><br><span class="line">  if (field == &#x27;key&#x27;) &#123;</span><br><span class="line">    let maxLengthRule = &#123; max: 40, message: &quot;不得超过40个字符&quot;, trigger: &quot;blur&quot; &#125;;</span><br><span class="line">    rules.push(maxLengthRule);</span><br><span class="line">    rules.push(&#123; validator: keyValidator, trigger: [&#x27;blur&#x27;, &#x27;change&#x27;] &#125;)</span><br><span class="line">  &#125; else &#123;</span><br><span class="line">    let maxLengthRule = &#123; max: 16, message: &quot;不得超过16个字符&quot;, trigger: &quot;blur&quot; &#125;;</span><br><span class="line">    rules.push(maxLengthRule);</span><br><span class="line">    rules.push(&#123; validator: nameValidator, trigger: [&#x27;blur&#x27;, &#x27;change&#x27;] &#125;)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  rules.push(requiredRule);</span><br><span class="line">  rules.push(</span><br><span class="line">    &#123;</span><br><span class="line">      validator:</span><br><span class="line">        nameOrKeyExistedValidator,</span><br><span class="line">      entity: entity,</span><br><span class="line">      extraParams: extraParams,</span><br><span class="line">      entityName: entityName,</span><br><span class="line">      trigger: &quot;blur&quot;,</span><br><span class="line">    &#125;</span><br><span class="line">  );</span><br><span class="line">  return rules;</span><br><span class="line">&#125;</span><br><span class="line">const keyValidator = (rule, value, callback) =&gt; &#123;</span><br><span class="line">  const reg = /^[a-zA-Z0-9_]+$/</span><br><span class="line">  if (!reg.test(value)) &#123;</span><br><span class="line">    callback(new Error(&#x27;仅支持英文、数字和下划线&#x27;))</span><br><span class="line">  &#125; else &#123;</span><br><span class="line">    callback();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">const nameValidator = (rule, value, callback) =&gt; &#123;</span><br><span class="line">  const reg = /^[a-zA-Z0-9_\u4e00-\u9fa5]+$/</span><br><span class="line"></span><br><span class="line">  if (!reg.test(value)) &#123;</span><br><span class="line">    callback(new Error(&#x27;仅支持中文、英文、数字和下划线&#x27;))</span><br><span class="line">  &#125; else &#123;</span><br><span class="line">    callback();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">const nameOrKeyExistedValidator = (rule, value, callback) =&gt; &#123;</span><br><span class="line">  if (rule.oldVal &amp;&amp; rule.oldVal === value) &#123;</span><br><span class="line">    callback();</span><br><span class="line">  &#125; else &#123;</span><br><span class="line">    nameOrKeyExisted(rule.entity, rule.field, value,rule.extraParams).then(res =&gt; &#123;</span><br><span class="line">      if (res) &#123;</span><br><span class="line">        if (rule.field === &quot;name&quot;) &#123;</span><br><span class="line">          callback(`$&#123;rule.entityName&#125;名称重复`)</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">          callback(`$&#123;rule.entityName&#125;标识重复`)</span><br><span class="line">        &#125;</span><br><span class="line">      &#125; else &#123;</span><br><span class="line">        callback();</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>编辑实体时的判断逻辑（传入oldVal，避免错误的报错）<br>这里的逻辑暂时没想到比较好的解决方法，所以写的比较恶心，因为原先的值可能是异步拿到的，所以需要手动赋值。传入oldVal后，当表单输入值与原先的值一致时，就不会调用后端判重接口了。<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">created() &#123;</span><br><span class="line">  if (this.isEdit) &#123;</span><br><span class="line">    this.rules.name[3].oldVal = this.ruleForm.name</span><br><span class="line">    this.rules.key[3].oldVal = this.ruleForm.key</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>封装后端axios请求：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">export function nameOrKeyExisted(entityName, type, data, params) &#123;</span><br><span class="line">  let queryParams =&#123;&#125;;</span><br><span class="line">  if (params) &#123;</span><br><span class="line">     queryParams = &#123;</span><br><span class="line">      ...params,</span><br><span class="line">      type: type,</span><br><span class="line">      nameOrKey: data</span><br><span class="line">     &#125;</span><br><span class="line">  &#125; else &#123;</span><br><span class="line">     queryParams = &#123;</span><br><span class="line">      type: type,</span><br><span class="line">      nameOrKey: data</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  return $get(`/api/$&#123;entityName&#125;/nameOrKeyExisted`, queryParams)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>请求的封装需要后端的配合~（因为这个平台后端也是由我一手包办的，所以当然不在话下啦）</p>
+<ul>
+<li>后端定义接口时，只需要注意后端URI和返回值一致就可以了。</li>
+</ul>
+<h1 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"> &lt;el-form :model=&quot;esseForm&quot; :rules=&quot;esseFormRules&quot; ref=&quot;baseInfoForm&quot;&gt;</span><br><span class="line">...</span><br><span class="line">&lt;/el-form&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">esseFormRules: &#123;</span><br><span class="line">       type: [</span><br><span class="line">         &#123;</span><br><span class="line">           required: true,</span><br><span class="line">           message: &#x27;请选择实体类型&#x27;,</span><br><span class="line">           trigger: &#x27;blur&#x27;</span><br><span class="line">         &#125;</span><br><span class="line">       ],</span><br><span class="line"></span><br><span class="line">       ...this.$utils.validate.getRules(&#x27;sem-esses&#x27;, &#x27;实体&#x27;,&#123;params: &#123;user: a&#125;&#125;)</span><br><span class="line">     &#125;,</span><br></pre></td></tr></table></figure>
+<p>如上，使用展开运算符，将返回的结果赋值到rules对象中，名称和标识的规则由通用的校验函数根据入参生成，该方法已经挂载到全局的$utils上，无需额外的引入成本，一次性生成了对于名称、标识的所有校验。</p>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>本方法适用于校验逻辑雷同、并且需要实体创建和校验的平台，如果功规调整，也能快速适应（例如长度从限制50字符改为限制100字符），节约时间。<br>缺陷：校验规则函数的灵活度往往与复杂度成正比，如果需要更多特殊的校验，需要考虑是否有必要修改校验函数，可能不太适用这种方法，如果创建表单的校验逻辑差异较大，就还是建议为每个表单定义自己的rules规则。</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/about/">About</a></li>
+        
+          <li><a href="/archives/">archives</a></li>
+        
+          <li><a href="/tags/">Tag</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%83%8C%E6%99%AF"><span class="toc-number">1.</span> <span class="toc-text">背景</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%B1%95%E5%BC%80%EF%BC%88spread%EF%BC%89%E8%BF%90%E7%AE%97%E7%AC%A6"><span class="toc-number">2.</span> <span class="toc-text">展开（spread）运算符</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%A0%A1%E9%AA%8C%E9%80%BB%E8%BE%91%E6%96%B9%E6%B3%95%E5%AE%9A%E4%B9%89"><span class="toc-number">3.</span> <span class="toc-text">校验逻辑方法定义</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%A1%E9%AA%8C%E5%87%BD%E6%95%B0%E5%B0%81%E8%A3%85"><span class="toc-number">3.1.</span> <span class="toc-text">校验函数封装</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8"><span class="toc-number">4.</span> <span class="toc-text">使用</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%B0%8F%E7%BB%93"><span class="toc-number">5.</span> <span class="toc-text">小结</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2021/07/08/JavaScript%20ES6%20%20%E4%BD%BF%E7%94%A8%E5%B1%95%E5%BC%80%E8%BF%90%E7%AE%97%E7%AC%A6%E5%AE%8C%E6%88%90%E5%85%A8%E5%B9%B3%E5%8F%B0%E6%A0%A1%E9%AA%8C%E9%87%8D%E5%90%8D%E9%80%BB%E8%BE%91%E5%B0%81%E8%A3%85/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2021/07/08/JavaScript%20ES6%20%20%E4%BD%BF%E7%94%A8%E5%B1%95%E5%BC%80%E8%BF%90%E7%AE%97%E7%AC%A6%E5%AE%8C%E6%88%90%E5%85%A8%E5%B9%B3%E5%8F%B0%E6%A0%A1%E9%AA%8C%E9%87%8D%E5%90%8D%E9%80%BB%E8%BE%91%E5%B0%81%E8%A3%85/&text=JavaScript ES6  使用展开运算符完成全平台校验重名逻辑封装"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2021/07/08/JavaScript%20ES6%20%20%E4%BD%BF%E7%94%A8%E5%B1%95%E5%BC%80%E8%BF%90%E7%AE%97%E7%AC%A6%E5%AE%8C%E6%88%90%E5%85%A8%E5%B9%B3%E5%8F%B0%E6%A0%A1%E9%AA%8C%E9%87%8D%E5%90%8D%E9%80%BB%E8%BE%91%E5%B0%81%E8%A3%85/&title=JavaScript ES6  使用展开运算符完成全平台校验重名逻辑封装"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2021/07/08/JavaScript%20ES6%20%20%E4%BD%BF%E7%94%A8%E5%B1%95%E5%BC%80%E8%BF%90%E7%AE%97%E7%AC%A6%E5%AE%8C%E6%88%90%E5%85%A8%E5%B9%B3%E5%8F%B0%E6%A0%A1%E9%AA%8C%E9%87%8D%E5%90%8D%E9%80%BB%E8%BE%91%E5%B0%81%E8%A3%85/&is_video=false&description=JavaScript ES6  使用展开运算符完成全平台校验重名逻辑封装"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=JavaScript ES6  使用展开运算符完成全平台校验重名逻辑封装&body=Check out this article: http://example.com/2021/07/08/JavaScript%20ES6%20%20%E4%BD%BF%E7%94%A8%E5%B1%95%E5%BC%80%E8%BF%90%E7%AE%97%E7%AC%A6%E5%AE%8C%E6%88%90%E5%85%A8%E5%B9%B3%E5%8F%B0%E6%A0%A1%E9%AA%8C%E9%87%8D%E5%90%8D%E9%80%BB%E8%BE%91%E5%B0%81%E8%A3%85/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2021/07/08/JavaScript%20ES6%20%20%E4%BD%BF%E7%94%A8%E5%B1%95%E5%BC%80%E8%BF%90%E7%AE%97%E7%AC%A6%E5%AE%8C%E6%88%90%E5%85%A8%E5%B9%B3%E5%8F%B0%E6%A0%A1%E9%AA%8C%E9%87%8D%E5%90%8D%E9%80%BB%E8%BE%91%E5%B0%81%E8%A3%85/&title=JavaScript ES6  使用展开运算符完成全平台校验重名逻辑封装"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2021/07/08/JavaScript%20ES6%20%20%E4%BD%BF%E7%94%A8%E5%B1%95%E5%BC%80%E8%BF%90%E7%AE%97%E7%AC%A6%E5%AE%8C%E6%88%90%E5%85%A8%E5%B9%B3%E5%8F%B0%E6%A0%A1%E9%AA%8C%E9%87%8D%E5%90%8D%E9%80%BB%E8%BE%91%E5%B0%81%E8%A3%85/&title=JavaScript ES6  使用展开运算符完成全平台校验重名逻辑封装"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2021/07/08/JavaScript%20ES6%20%20%E4%BD%BF%E7%94%A8%E5%B1%95%E5%BC%80%E8%BF%90%E7%AE%97%E7%AC%A6%E5%AE%8C%E6%88%90%E5%85%A8%E5%B9%B3%E5%8F%B0%E6%A0%A1%E9%AA%8C%E9%87%8D%E5%90%8D%E9%80%BB%E8%BE%91%E5%B0%81%E8%A3%85/&title=JavaScript ES6  使用展开运算符完成全平台校验重名逻辑封装"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2021/07/08/JavaScript%20ES6%20%20%E4%BD%BF%E7%94%A8%E5%B1%95%E5%BC%80%E8%BF%90%E7%AE%97%E7%AC%A6%E5%AE%8C%E6%88%90%E5%85%A8%E5%B9%B3%E5%8F%B0%E6%A0%A1%E9%AA%8C%E9%87%8D%E5%90%8D%E9%80%BB%E8%BE%91%E5%B0%81%E8%A3%85/&title=JavaScript ES6  使用展开运算符完成全平台校验重名逻辑封装"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2021/07/08/JavaScript%20ES6%20%20%E4%BD%BF%E7%94%A8%E5%B1%95%E5%BC%80%E8%BF%90%E7%AE%97%E7%AC%A6%E5%AE%8C%E6%88%90%E5%85%A8%E5%B9%B3%E5%8F%B0%E6%A0%A1%E9%AA%8C%E9%87%8D%E5%90%8D%E9%80%BB%E8%BE%91%E5%B0%81%E8%A3%85/&name=JavaScript ES6  使用展开运算符完成全平台校验重名逻辑封装&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2021/07/08/JavaScript%20ES6%20%20%E4%BD%BF%E7%94%A8%E5%B1%95%E5%BC%80%E8%BF%90%E7%AE%97%E7%AC%A6%E5%AE%8C%E6%88%90%E5%85%A8%E5%B9%B3%E5%8F%B0%E6%A0%A1%E9%AA%8C%E9%87%8D%E5%90%8D%E9%80%BB%E8%BE%91%E5%B0%81%E8%A3%85/&t=JavaScript ES6  使用展开运算符完成全平台校验重名逻辑封装"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2024
+    Ygria
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">archives</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tag</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

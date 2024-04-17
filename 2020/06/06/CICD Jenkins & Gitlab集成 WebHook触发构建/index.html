@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="在上一篇博客中，我们学习了Jenkins的搭建和插件+流水线的基本使用方法，Jenkins极大地提升了部署效率。最近想学习一下如何集成GitLab webhook，实现进一步解放双手，目标：  推送（git push）触发构建 推送到指定分支触发构建 根据commit的文件，结合mvn -pl 指令，实现部分增量构建，并记录commit信息  推送事件也可以换成Tag push events、Me">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CICD Jenkins &amp; Gitlab集成 WebHook触发构建">
+<meta property="og:url" content="http://example.com/2020/06/06/CICD%20Jenkins%20&%20Gitlab%E9%9B%86%E6%88%90%20WebHook%E8%A7%A6%E5%8F%91%E6%9E%84%E5%BB%BA/index.html">
+<meta property="og:site_name" content="孤光自照">
+<meta property="og:description" content="在上一篇博客中，我们学习了Jenkins的搭建和插件+流水线的基本使用方法，Jenkins极大地提升了部署效率。最近想学习一下如何集成GitLab webhook，实现进一步解放双手，目标：  推送（git push）触发构建 推送到指定分支触发构建 根据commit的文件，结合mvn -pl 指令，实现部分增量构建，并记录commit信息  推送事件也可以换成Tag push events、Me">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153252.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153238.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153303.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153312.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153324.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153333.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153344.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153354.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153403.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153413.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153423.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153442.png">
+<meta property="article:published_time" content="2020-06-05T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-04-17T13:21:57.000Z">
+<meta property="article:author" content="Ygria">
+<meta property="article:tag" content="编程">
+<meta property="article:tag" content="运维">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153252.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>CICD Jenkins &amp; Gitlab集成 WebHook触发构建</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">archives</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tag</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2020/06/30/Linux%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%EF%BC%9ADocker%E7%BD%91%E7%BB%9C%E7%9F%A5%E8%AF%86%E4%B9%8B%E5%9F%BA%E7%A1%80%E7%AF%87/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2020/05/23/vue-codemirror%20+%20Java%20Compiler%E5%AE%9E%E7%8E%B0Java%20Web%20IDE/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2020/06/06/CICD%20Jenkins%20&amp;%20Gitlab%E9%9B%86%E6%88%90%20WebHook%E8%A7%A6%E5%8F%91%E6%9E%84%E5%BB%BA/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2020/06/06/CICD%20Jenkins%20&amp;%20Gitlab%E9%9B%86%E6%88%90%20WebHook%E8%A7%A6%E5%8F%91%E6%9E%84%E5%BB%BA/&text=CICD Jenkins &amp; Gitlab集成 WebHook触发构建"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2020/06/06/CICD%20Jenkins%20&amp;%20Gitlab%E9%9B%86%E6%88%90%20WebHook%E8%A7%A6%E5%8F%91%E6%9E%84%E5%BB%BA/&title=CICD Jenkins &amp; Gitlab集成 WebHook触发构建"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2020/06/06/CICD%20Jenkins%20&amp;%20Gitlab%E9%9B%86%E6%88%90%20WebHook%E8%A7%A6%E5%8F%91%E6%9E%84%E5%BB%BA/&is_video=false&description=CICD Jenkins &amp; Gitlab集成 WebHook触发构建"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=CICD Jenkins &amp; Gitlab集成 WebHook触发构建&body=Check out this article: http://example.com/2020/06/06/CICD%20Jenkins%20&amp;%20Gitlab%E9%9B%86%E6%88%90%20WebHook%E8%A7%A6%E5%8F%91%E6%9E%84%E5%BB%BA/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2020/06/06/CICD%20Jenkins%20&amp;%20Gitlab%E9%9B%86%E6%88%90%20WebHook%E8%A7%A6%E5%8F%91%E6%9E%84%E5%BB%BA/&title=CICD Jenkins &amp; Gitlab集成 WebHook触发构建"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2020/06/06/CICD%20Jenkins%20&amp;%20Gitlab%E9%9B%86%E6%88%90%20WebHook%E8%A7%A6%E5%8F%91%E6%9E%84%E5%BB%BA/&title=CICD Jenkins &amp; Gitlab集成 WebHook触发构建"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2020/06/06/CICD%20Jenkins%20&amp;%20Gitlab%E9%9B%86%E6%88%90%20WebHook%E8%A7%A6%E5%8F%91%E6%9E%84%E5%BB%BA/&title=CICD Jenkins &amp; Gitlab集成 WebHook触发构建"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2020/06/06/CICD%20Jenkins%20&amp;%20Gitlab%E9%9B%86%E6%88%90%20WebHook%E8%A7%A6%E5%8F%91%E6%9E%84%E5%BB%BA/&title=CICD Jenkins &amp; Gitlab集成 WebHook触发构建"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2020/06/06/CICD%20Jenkins%20&amp;%20Gitlab%E9%9B%86%E6%88%90%20WebHook%E8%A7%A6%E5%8F%91%E6%9E%84%E5%BB%BA/&name=CICD Jenkins &amp; Gitlab集成 WebHook触发构建&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2020/06/06/CICD%20Jenkins%20&amp;%20Gitlab%E9%9B%86%E6%88%90%20WebHook%E8%A7%A6%E5%8F%91%E6%9E%84%E5%BB%BA/&t=CICD Jenkins &amp; Gitlab集成 WebHook触发构建"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9F%BA%E7%A1%80%E5%AE%9E%E7%8E%B0"><span class="toc-number">1.</span> <span class="toc-text">基础实现</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%8B%E8%BD%BD%E5%B9%B6%E9%85%8D%E7%BD%AE%E6%8F%92%E4%BB%B6"><span class="toc-number">1.1.</span> <span class="toc-text">下载并配置插件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9C%A8GitLab%E4%B8%AD%E9%85%8D%E7%BD%AE"><span class="toc-number">1.2.</span> <span class="toc-text">在GitLab中配置</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%BF%9B%E9%98%B6%E5%AE%9E%E7%8E%B0"><span class="toc-number">2.</span> <span class="toc-text">进阶实现</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Jenkins%E6%8F%92%E4%BB%B6-Generic-WebHook-Trigger-Pugin"><span class="toc-number">2.1.</span> <span class="toc-text">Jenkins插件:Generic WebHook Trigger Pugin</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9C%A8Jenkins-Job%E4%B8%AD%E9%85%8D%E7%BD%AE%E6%8E%A5%E6%94%B6%E5%9C%B0%E5%9D%80"><span class="toc-number">2.1.1.</span> <span class="toc-text">在Jenkins Job中配置接收地址</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE%E9%89%B4%E6%9D%83token"><span class="toc-number">2.1.2.</span> <span class="toc-text">配置鉴权token</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#GitLab%E9%85%8D%E7%BD%AE"><span class="toc-number">2.1.3.</span> <span class="toc-text">GitLab配置</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BC%96%E5%86%99%E6%B5%81%E6%B0%B4%E7%BA%BF%E8%84%9A%E6%9C%AC"><span class="toc-number">3.</span> <span class="toc-text">编写流水线脚本</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B5%81%E6%B0%B4%E7%BA%BF%E8%A7%A6%E5%8F%91%E5%99%A8%E8%AF%AD%E6%B3%95"><span class="toc-number">3.1.</span> <span class="toc-text">流水线触发器语法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E6%96%B9%E6%B3%95"><span class="toc-number">3.2.</span> <span class="toc-text">核心方法</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">4.</span> <span class="toc-text">总结</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        CICD Jenkins &amp; Gitlab集成 WebHook触发构建
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Ygria</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2020-06-05T16:00:00.000Z" class="dt-published" itemprop="datePublished">2020-06-06</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/%E7%BC%96%E7%A8%8B/" rel="tag">编程</a>, <a class="p-category" href="/tags/%E8%BF%90%E7%BB%B4/" rel="tag">运维</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <p>在上一篇博客中，我们学习了<code>Jenkins</code>的搭建和插件+流水线的基本使用方法，<code>Jenkins</code>极大地提升了部署效率。<br>最近想学习一下如何集成<code>GitLab webhook</code>，实现进一步解放双手，目标：</p>
+<ul>
+<li>推送（<code>git push</code>）触发构建</li>
+<li>推送到指定分支触发构建</li>
+<li>根据<code>commit</code>的文件，结合<code>mvn -pl </code>指令，实现部分增量构建，并记录<code>commit</code>信息</li>
+</ul>
+<p>推送事件也可以换成<code>Tag push events</code>、<code>Merge request events</code>等其他触发条件，根据需要自由选择。</p>
+<h1 id="基础实现"><a href="#基础实现" class="headerlink" title="基础实现"></a>基础实现</h1><p>使用<code>Gitlab Hook Plugin</code>，并在Jenkins和GitLab中分别配置。</p>
+<h2 id="下载并配置插件"><a href="#下载并配置插件" class="headerlink" title="下载并配置插件"></a>下载并配置插件</h2><p><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153252.png" alt="image.png"></p>
+<p><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153238.png" alt="image.png"></p>
+<h2 id="在GitLab中配置"><a href="#在GitLab中配置" class="headerlink" title="在GitLab中配置"></a>在<code>GitLab</code>中配置</h2><p><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153303.png" alt="image.png"></p>
+<p><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153312.png" alt="image.png"></p>
+<p><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153324.png" alt="image.png"></p>
+<p><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153333.png" alt="image.png"></p>
+<p><strong>至此，目标中的前两条，推送构建和推送到指定分支构建实现！</strong></p>
+<h1 id="进阶实现"><a href="#进阶实现" class="headerlink" title="进阶实现"></a>进阶实现</h1><p>从上述过程，我们也可以看出，<code>WebHook</code>的本质就是从<code>GitLab</code>发了一条请求，<code>Jenkins</code>配置了一个终端地址（<code>endpoint</code>）来接收，从而实现了两个步骤的串联。<br>这个请求实质上就是一条<code>HTTP POST</code>请求。<br>相信接触过服务互相调用的小伙伴们都不陌生。有了请求体，我们自然可以拿到自己想要的东西，进行进一步的处理了。<br><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153344.png" alt="image.png"></p>
+<h2 id="Jenkins插件-Generic-WebHook-Trigger-Pugin"><a href="#Jenkins插件-Generic-WebHook-Trigger-Pugin" class="headerlink" title="Jenkins插件:Generic WebHook Trigger Pugin"></a>Jenkins插件:Generic WebHook Trigger Pugin</h2><p><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153354.png" alt="image.png"></p>
+<p>从插件简介来看，支持接收任何一个<code>HTTP</code>请求，当然也包括接收<code>GitLab</code>发送的请求。</p>
+<h3 id="在Jenkins-Job中配置接收地址"><a href="#在Jenkins-Job中配置接收地址" class="headerlink" title="在Jenkins Job中配置接收地址"></a>在<code>Jenkins Job</code>中配置接收地址</h3><p><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153403.png" alt="image.png"></p>
+<h3 id="配置鉴权token"><a href="#配置鉴权token" class="headerlink" title="配置鉴权token"></a>配置鉴权token</h3><p><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153413.png" alt="image.png"></p>
+<p>我直接使用<code>admin</code>帐号创建，在发送请求时需要携带此token。</p>
+<h3 id="GitLab配置"><a href="#GitLab配置" class="headerlink" title="GitLab配置"></a>GitLab配置</h3><p>在Gitlab中的配置与上文相同，格式为：<br><code>http://admin:$&#123;token&#125;@$&#123;JENKINS_IP&#125;:$&#123;PORT&#125;/generic-webhook-trigger/invoke</code><br>填上刚刚配置生成的<code>token</code>和自己的<code>Jenkins</code>地址和端口即可。<br>同样可以使用自带的测试来测试连接，返回200成功。</p>
+<ul>
+<li>如果返回<code>404</code>，看配置的地址是否有误</li>
+<li>返回<code>403</code>，查看权限配置是否有误<br><strong>至此，连接建立成功！</strong></li>
+</ul>
+<h1 id="编写流水线脚本"><a href="#编写流水线脚本" class="headerlink" title="编写流水线脚本"></a>编写流水线脚本</h1><p>关于如何使用声明式流水线，上一次的博客已有所介绍。这里主要说明如何加入触发器语法。</p>
+<h2 id="流水线触发器语法"><a href="#流水线触发器语法" class="headerlink" title="流水线触发器语法"></a>流水线触发器语法</h2><p><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153423.png" alt="image.png"></p>
+<p>要从请求体中拿到所需要的参数，可以通过配置获取JSONPath参数实现。</p>
+<p>在流水线中加入下列语句，<strong>即可当作变量在流水线脚本中使用。</strong></p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">triggers &#123;</span><br><span class="line">       GenericTrigger(</span><br><span class="line">           <span class="symbol">genericVariables:</span> [</span><br><span class="line">             [<span class="attr">key:</span> <span class="string">&#x27;branch&#x27;</span>, <span class="attr">value:</span> <span class="string">&#x27;$.ref&#x27;</span>],</span><br><span class="line">             [<span class="attr">key:</span><span class="string">&#x27;commitText&#x27;</span>, <span class="attr">value:</span><span class="string">&#x27;$.commits&#x27;</span>]</span><br><span class="line">           ],</span><br><span class="line">           <span class="symbol">causeString:</span> <span class="string">&#x27;Triggered on $branch&#x27;</span> ,</span><br><span class="line">           <span class="symbol">printContributedVariables:</span> <span class="literal">false</span>,</span><br><span class="line">           <span class="symbol">printPostContent:</span> <span class="literal">false</span></span><br><span class="line">       )</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>序列化JSON<br>要想在pipeline脚本中将字符串反序列化成JSON对象，可以引入 <code>Pipeline Utility Step</code>插件，该插件提供了一些工具方法。<br><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153442.png" alt="image.png"></li>
+</ul>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> commits = readJSON <span class="attr">text:</span> commitText</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>流水线脚本使用<code>Groovy</code>语言，该语言基于<code>Java</code>编写，也集成了一些有趣的特性。在IDEA中编写只需要配置<code>Groovy Library</code>即可。</p>
+</blockquote>
+<h2 id="核心方法"><a href="#核心方法" class="headerlink" title="核心方法"></a>核心方法</h2><ul>
+<li>根据commits，定义patternMap，匹配到指定正则文件格式，构建指定组件。</li>
+</ul>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">    <span class="keyword">def</span> modifiedFile = [];</span><br><span class="line">    <span class="keyword">for</span> (commit <span class="keyword">in</span> commits) &#123;</span><br><span class="line">            modifiedFile.addAll(commit.getAt(<span class="string">&quot;added&quot;</span>).findAll())</span><br><span class="line">            modifiedFile.addAll(commit.getAt(<span class="string">&quot;modified&quot;</span>).findAll())</span><br><span class="line">            modifiedFile.addAll(commit.getAt(<span class="string">&quot;removed&quot;</span>).findAll())</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">def</span> buildComponents = <span class="keyword">new</span> HashSet();</span><br><span class="line">        <span class="keyword">def</span> patternMap = [<span class="string">&#x27;mark-engine-manager/.*&#x27;</span>: <span class="string">&#x27;manager&#x27;</span>, <span class="string">&#x27;mark-tools/.*&#x27;</span>: <span class="string">&#x27;web&#x27;</span>,<span class="string">&#x27;mark-engine-dm/.*&#x27;</span>:<span class="string">&#x27;dm&#x27;</span>,<span class="string">&#x27;mark-engine-web/.*&#x27;</span>:<span class="string">&#x27;web&#x27;</span>,</span><br><span class="line">        <span class="string">&#x27;mark-engine-uc/.*&#x27;</span>:<span class="string">&#x27;uc&#x27;</span>,<span class="string">&#x27;mark-engine-gateway/.*&#x27;</span>:<span class="string">&#x27;gateway&#x27;</span>];</span><br><span class="line"><span class="comment">//遍历所有修改了的文件</span></span><br><span class="line">        <span class="keyword">for</span> (file <span class="keyword">in</span> modifiedFile) &#123;</span><br><span class="line">            <span class="keyword">for</span>(entry <span class="keyword">in</span> patternMap.entrySet())&#123;</span><br><span class="line">                <span class="keyword">if</span> (file ==~ entry.key) &#123;</span><br><span class="line">                    buildComponents &lt;&lt; entry.value;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>根据需要构建的组件，拼接<code>maven</code>构建指令。<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">String mvnCmd = <span class="string">&#x27;mvn clean install -Dmaven.test.skip=true&#x27;</span></span><br><span class="line"><span class="keyword">for</span>(component <span class="keyword">in</span> buildComponents)&#123;</span><br><span class="line">      mvnCmd = mvnCmd + <span class="string">&#x27; -pl mark-engine-&#x27;</span>+component+<span class="string">&#x27;,&#x27;</span>;</span><br><span class="line">&#125;                    </span><br></pre></td></tr></table></figure>
+<strong>经过调试和测试push，三个目标全部完成。</strong></li>
+</ul>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p><strong>一切都是代码</strong>，CICD当然也可以使用代码实现。经过实践我们可以探索出Jenkins更多有趣的玩法。</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/about/">About</a></li>
+        
+          <li><a href="/archives/">archives</a></li>
+        
+          <li><a href="/tags/">Tag</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9F%BA%E7%A1%80%E5%AE%9E%E7%8E%B0"><span class="toc-number">1.</span> <span class="toc-text">基础实现</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%8B%E8%BD%BD%E5%B9%B6%E9%85%8D%E7%BD%AE%E6%8F%92%E4%BB%B6"><span class="toc-number">1.1.</span> <span class="toc-text">下载并配置插件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9C%A8GitLab%E4%B8%AD%E9%85%8D%E7%BD%AE"><span class="toc-number">1.2.</span> <span class="toc-text">在GitLab中配置</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%BF%9B%E9%98%B6%E5%AE%9E%E7%8E%B0"><span class="toc-number">2.</span> <span class="toc-text">进阶实现</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Jenkins%E6%8F%92%E4%BB%B6-Generic-WebHook-Trigger-Pugin"><span class="toc-number">2.1.</span> <span class="toc-text">Jenkins插件:Generic WebHook Trigger Pugin</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9C%A8Jenkins-Job%E4%B8%AD%E9%85%8D%E7%BD%AE%E6%8E%A5%E6%94%B6%E5%9C%B0%E5%9D%80"><span class="toc-number">2.1.1.</span> <span class="toc-text">在Jenkins Job中配置接收地址</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE%E9%89%B4%E6%9D%83token"><span class="toc-number">2.1.2.</span> <span class="toc-text">配置鉴权token</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#GitLab%E9%85%8D%E7%BD%AE"><span class="toc-number">2.1.3.</span> <span class="toc-text">GitLab配置</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BC%96%E5%86%99%E6%B5%81%E6%B0%B4%E7%BA%BF%E8%84%9A%E6%9C%AC"><span class="toc-number">3.</span> <span class="toc-text">编写流水线脚本</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B5%81%E6%B0%B4%E7%BA%BF%E8%A7%A6%E5%8F%91%E5%99%A8%E8%AF%AD%E6%B3%95"><span class="toc-number">3.1.</span> <span class="toc-text">流水线触发器语法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E6%96%B9%E6%B3%95"><span class="toc-number">3.2.</span> <span class="toc-text">核心方法</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">4.</span> <span class="toc-text">总结</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2020/06/06/CICD%20Jenkins%20&amp;%20Gitlab%E9%9B%86%E6%88%90%20WebHook%E8%A7%A6%E5%8F%91%E6%9E%84%E5%BB%BA/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2020/06/06/CICD%20Jenkins%20&amp;%20Gitlab%E9%9B%86%E6%88%90%20WebHook%E8%A7%A6%E5%8F%91%E6%9E%84%E5%BB%BA/&text=CICD Jenkins &amp; Gitlab集成 WebHook触发构建"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2020/06/06/CICD%20Jenkins%20&amp;%20Gitlab%E9%9B%86%E6%88%90%20WebHook%E8%A7%A6%E5%8F%91%E6%9E%84%E5%BB%BA/&title=CICD Jenkins &amp; Gitlab集成 WebHook触发构建"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2020/06/06/CICD%20Jenkins%20&amp;%20Gitlab%E9%9B%86%E6%88%90%20WebHook%E8%A7%A6%E5%8F%91%E6%9E%84%E5%BB%BA/&is_video=false&description=CICD Jenkins &amp; Gitlab集成 WebHook触发构建"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=CICD Jenkins &amp; Gitlab集成 WebHook触发构建&body=Check out this article: http://example.com/2020/06/06/CICD%20Jenkins%20&amp;%20Gitlab%E9%9B%86%E6%88%90%20WebHook%E8%A7%A6%E5%8F%91%E6%9E%84%E5%BB%BA/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2020/06/06/CICD%20Jenkins%20&amp;%20Gitlab%E9%9B%86%E6%88%90%20WebHook%E8%A7%A6%E5%8F%91%E6%9E%84%E5%BB%BA/&title=CICD Jenkins &amp; Gitlab集成 WebHook触发构建"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2020/06/06/CICD%20Jenkins%20&amp;%20Gitlab%E9%9B%86%E6%88%90%20WebHook%E8%A7%A6%E5%8F%91%E6%9E%84%E5%BB%BA/&title=CICD Jenkins &amp; Gitlab集成 WebHook触发构建"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2020/06/06/CICD%20Jenkins%20&amp;%20Gitlab%E9%9B%86%E6%88%90%20WebHook%E8%A7%A6%E5%8F%91%E6%9E%84%E5%BB%BA/&title=CICD Jenkins &amp; Gitlab集成 WebHook触发构建"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2020/06/06/CICD%20Jenkins%20&amp;%20Gitlab%E9%9B%86%E6%88%90%20WebHook%E8%A7%A6%E5%8F%91%E6%9E%84%E5%BB%BA/&title=CICD Jenkins &amp; Gitlab集成 WebHook触发构建"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2020/06/06/CICD%20Jenkins%20&amp;%20Gitlab%E9%9B%86%E6%88%90%20WebHook%E8%A7%A6%E5%8F%91%E6%9E%84%E5%BB%BA/&name=CICD Jenkins &amp; Gitlab集成 WebHook触发构建&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2020/06/06/CICD%20Jenkins%20&amp;%20Gitlab%E9%9B%86%E6%88%90%20WebHook%E8%A7%A6%E5%8F%91%E6%9E%84%E5%BB%BA/&t=CICD Jenkins &amp; Gitlab集成 WebHook触发构建"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2024
+    Ygria
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">archives</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tag</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="我们在工作中应用了docker容器化技术，服务的部署、维护和扩展都方便了很多。然而，近期在私有化部署过程中，由于不同服务器环境的复杂多变，常常遇到网络方面的问题，现象为容器服务运行正常，但宿主机、容器之间网络不通。本篇博客旨在总结：  Linux虚拟网络及docker网络的基础知识 遇到网络问题时排查问题思路 常用指令和工具的使用  以上三部分作为之后的参考，本篇文章也将会在日后实践过程中逐渐补充">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux虚拟网络：Docker网络知识之基础篇">
+<meta property="og:url" content="http://example.com/2020/06/30/Linux%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%EF%BC%9ADocker%E7%BD%91%E7%BB%9C%E7%9F%A5%E8%AF%86%E4%B9%8B%E5%9F%BA%E7%A1%80%E7%AF%87/index.html">
+<meta property="og:site_name" content="孤光自照">
+<meta property="og:description" content="我们在工作中应用了docker容器化技术，服务的部署、维护和扩展都方便了很多。然而，近期在私有化部署过程中，由于不同服务器环境的复杂多变，常常遇到网络方面的问题，现象为容器服务运行正常，但宿主机、容器之间网络不通。本篇博客旨在总结：  Linux虚拟网络及docker网络的基础知识 遇到网络问题时排查问题思路 常用指令和工具的使用  以上三部分作为之后的参考，本篇文章也将会在日后实践过程中逐渐补充">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/6810620-8187694f1d4d7dd2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/6810620-88e4ef5d99f13359.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/6810620-8b57f92a2c1941ce.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/6810620-1986bf9ba4a3a090.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/6810620-9d869758c007bf38.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/6810620-2a4faa72585b3bb5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/6810620-440166ee3f148b3a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="article:published_time" content="2020-06-29T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-04-16T16:17:25.000Z">
+<meta property="article:author" content="Ygria">
+<meta property="article:tag" content="编程">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://upload-images.jianshu.io/upload_images/6810620-8187694f1d4d7dd2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Linux虚拟网络：Docker网络知识之基础篇</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">archives</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tag</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2020/08/08/Vue+Element%20UI%20%E6%A0%91%E5%BD%A2%E6%8E%A7%E4%BB%B6%E6%95%B4%E5%90%88%E4%B8%8B%E6%8B%89%E5%8A%9F%E8%83%BD%E8%8F%9C%E5%8D%95%EF%BC%88tree%20+%20dropdown%20+input%EF%BC%89/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2020/06/06/CICD%20Jenkins%20&%20Gitlab%E9%9B%86%E6%88%90%20WebHook%E8%A7%A6%E5%8F%91%E6%9E%84%E5%BB%BA/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2020/06/30/Linux%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%EF%BC%9ADocker%E7%BD%91%E7%BB%9C%E7%9F%A5%E8%AF%86%E4%B9%8B%E5%9F%BA%E7%A1%80%E7%AF%87/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2020/06/30/Linux%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%EF%BC%9ADocker%E7%BD%91%E7%BB%9C%E7%9F%A5%E8%AF%86%E4%B9%8B%E5%9F%BA%E7%A1%80%E7%AF%87/&text=Linux虚拟网络：Docker网络知识之基础篇"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2020/06/30/Linux%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%EF%BC%9ADocker%E7%BD%91%E7%BB%9C%E7%9F%A5%E8%AF%86%E4%B9%8B%E5%9F%BA%E7%A1%80%E7%AF%87/&title=Linux虚拟网络：Docker网络知识之基础篇"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2020/06/30/Linux%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%EF%BC%9ADocker%E7%BD%91%E7%BB%9C%E7%9F%A5%E8%AF%86%E4%B9%8B%E5%9F%BA%E7%A1%80%E7%AF%87/&is_video=false&description=Linux虚拟网络：Docker网络知识之基础篇"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Linux虚拟网络：Docker网络知识之基础篇&body=Check out this article: http://example.com/2020/06/30/Linux%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%EF%BC%9ADocker%E7%BD%91%E7%BB%9C%E7%9F%A5%E8%AF%86%E4%B9%8B%E5%9F%BA%E7%A1%80%E7%AF%87/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2020/06/30/Linux%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%EF%BC%9ADocker%E7%BD%91%E7%BB%9C%E7%9F%A5%E8%AF%86%E4%B9%8B%E5%9F%BA%E7%A1%80%E7%AF%87/&title=Linux虚拟网络：Docker网络知识之基础篇"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2020/06/30/Linux%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%EF%BC%9ADocker%E7%BD%91%E7%BB%9C%E7%9F%A5%E8%AF%86%E4%B9%8B%E5%9F%BA%E7%A1%80%E7%AF%87/&title=Linux虚拟网络：Docker网络知识之基础篇"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2020/06/30/Linux%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%EF%BC%9ADocker%E7%BD%91%E7%BB%9C%E7%9F%A5%E8%AF%86%E4%B9%8B%E5%9F%BA%E7%A1%80%E7%AF%87/&title=Linux虚拟网络：Docker网络知识之基础篇"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2020/06/30/Linux%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%EF%BC%9ADocker%E7%BD%91%E7%BB%9C%E7%9F%A5%E8%AF%86%E4%B9%8B%E5%9F%BA%E7%A1%80%E7%AF%87/&title=Linux虚拟网络：Docker网络知识之基础篇"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2020/06/30/Linux%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%EF%BC%9ADocker%E7%BD%91%E7%BB%9C%E7%9F%A5%E8%AF%86%E4%B9%8B%E5%9F%BA%E7%A1%80%E7%AF%87/&name=Linux虚拟网络：Docker网络知识之基础篇&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2020/06/30/Linux%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%EF%BC%9ADocker%E7%BD%91%E7%BB%9C%E7%9F%A5%E8%AF%86%E4%B9%8B%E5%9F%BA%E7%A1%80%E7%AF%87/&t=Linux虚拟网络：Docker网络知识之基础篇"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Linux%E7%BD%91%E7%BB%9C%E8%99%9A%E6%8B%9F%E5%8C%96%E5%9F%BA%E7%A1%80"><span class="toc-number">1.</span> <span class="toc-text">Linux网络虚拟化基础</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Network-Namespace"><span class="toc-number">1.1.</span> <span class="toc-text">Network Namespace</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Veth-Pair%EF%BC%88Virtual-Ethernet-Pair%EF%BC%89"><span class="toc-number">1.2.</span> <span class="toc-text">Veth Pair（Virtual Ethernet Pair）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Bridge-%E7%BD%91%E6%A1%A5"><span class="toc-number">1.3.</span> <span class="toc-text">Bridge 网桥</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#iptables-Netfilter"><span class="toc-number">1.4.</span> <span class="toc-text">iptables&#x2F;Netfilter</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Docker%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80"><span class="toc-number">2.</span> <span class="toc-text">Docker网络基础</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Bridge-%E6%A1%A5%E6%8E%A5%E6%A8%A1%E5%BC%8F"><span class="toc-number">2.1.</span> <span class="toc-text">Bridge 桥接模式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#host%E6%A8%A1%E5%BC%8F"><span class="toc-number">2.2.</span> <span class="toc-text">host模式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#container"><span class="toc-number">2.3.</span> <span class="toc-text">container</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#none"><span class="toc-number">2.4.</span> <span class="toc-text">none</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E2%80%93link"><span class="toc-number">2.4.1.</span> <span class="toc-text">–link</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%B0%8F%E7%BB%93"><span class="toc-number">3.</span> <span class="toc-text">小结</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        Linux虚拟网络：Docker网络知识之基础篇
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Ygria</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2020-06-29T16:00:00.000Z" class="dt-published" itemprop="datePublished">2020-06-30</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/%E7%BC%96%E7%A8%8B/" rel="tag">编程</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <p>我们在工作中应用了docker容器化技术，服务的部署、维护和扩展都方便了很多。然而，近期在私有化部署过程中，由于不同服务器环境的复杂多变，常常遇到网络方面的问题，现象为容器服务运行正常，但宿主机、容器之间网络不通。<br>本篇博客旨在总结：</p>
+<ul>
+<li>Linux虚拟网络及docker网络的基础知识</li>
+<li>遇到网络问题时排查问题思路</li>
+<li>常用指令和工具的使用</li>
+</ul>
+<p>以上三部分作为之后的参考，本篇文章也将会在日后实践过程中逐渐补充。本篇为第一篇，主要介绍基础知识</p>
+<h1 id="Linux网络虚拟化基础"><a href="#Linux网络虚拟化基础" class="headerlink" title="Linux网络虚拟化基础"></a>Linux网络虚拟化基础</h1><h2 id="Network-Namespace"><a href="#Network-Namespace" class="headerlink" title="Network Namespace"></a>Network Namespace</h2><blockquote>
+<p>网络命名空间，是Linux 2.6.x内核版本之后提供的功能，主要用于资源的隔离。namespace是实现网络虚拟化的重要功能，使用它，一个Linux系统可以抽象出多个网络子系统，各个子系统都有自己独立的网卡、路由表、iptables、协议栈等网络资源。不管是虚拟机还是容器，运行时仿佛自己都在独立的网络中。</p>
+</blockquote>
+<p><code>ip netns</code>命令用于完成对ns的各种操作，<code>ip netns exec</code>子命令用于在namespace执行指令。</p>
+<h2 id="Veth-Pair（Virtual-Ethernet-Pair）"><a href="#Veth-Pair（Virtual-Ethernet-Pair）" class="headerlink" title="Veth Pair（Virtual Ethernet Pair）"></a>Veth Pair（Virtual Ethernet Pair）</h2><blockquote>
+<p>成对虚拟设备端口。它总是成对出现，一端连着协议栈，一端彼此连着。从其中一个端口发出的数据包，可以直接出现在与它对应的另一个端口上，即使它们在不同的namespace中。</p>
+</blockquote>
+<p><img src="https://upload-images.jianshu.io/upload_images/6810620-8187694f1d4d7dd2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Veth Pair功能：在不同的ns中通信"><br>如上图，一对veth-pair直接将两个namespace连接在一起。</p>
+<ul>
+<li>使用如下图所示命令，测试veth pair功能<br><img src="https://upload-images.jianshu.io/upload_images/6810620-88e4ef5d99f13359.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="测试使用veth pair连通两个namespace"></li>
+</ul>
+<h2 id="Bridge-网桥"><a href="#Bridge-网桥" class="headerlink" title="Bridge 网桥"></a>Bridge 网桥</h2><p>veth pair打破了Network Namespace的限制，实现了不同Network Namespace之间的通信。但是veth pair的局限性也很明显，只能实现两个网络接口的通信。<br>Linux中引入网桥来实现多个网络接口之间的通信，可以将一台机器上的若干接口连通起来。在OSI网络模型中，网桥属于数据链路层。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/6810620-8b57f92a2c1941ce.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="网桥连通多个端口示意图"></p>
+<p>和网桥相关的操作使用命令<code>brctl</code>，需要先安装<code>bridge-utils</code>工具包。安装指令：<br><code>yum install bridge-utils</code></p>
+<h2 id="iptables-Netfilter"><a href="#iptables-Netfilter" class="headerlink" title="iptables&#x2F;Netfilter"></a>iptables&#x2F;Netfilter</h2><p>请参考：<a target="_blank" rel="noopener" href="http://www.zsythink.net/archives/1199">iptables详解（1）：iptables概念</a></p>
+<h1 id="Docker网络基础"><a href="#Docker网络基础" class="headerlink" title="Docker网络基础"></a>Docker网络基础</h1><p>Docker支持四种网络模式：host模式，container模式，none模式和bridge模式。默认使用的是桥接模式。<br>使用<code>docker network ls</code>指令可以查看到宿主机上所有的Docker网络：<br><img src="https://upload-images.jianshu.io/upload_images/6810620-1986bf9ba4a3a090.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="当前宿主机所有的docker网络"></p>
+<h2 id="Bridge-桥接模式"><a href="#Bridge-桥接模式" class="headerlink" title="Bridge 桥接模式"></a>Bridge 桥接模式</h2><blockquote>
+<p>Docker在启动时，默认会自动创建网桥设备docker0，Docker在运行时，守护进程通过docker0为docker的容器提供网络通信服务。<br>当Docker启动容器时，会创建一对Veth Pair，并将其中一个veth网络设备附加到网桥docker0，另一个加入容器的network namespace中。</p>
+</blockquote>
+<p>根据上一节中关于网桥的定义，我们很容易画出示意图：</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/6810620-9d869758c007bf38.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Docker网桥模型"></p>
+<p>由上图可得，容器可以通过网桥互相通信。如果不想使用默认的网桥设备，也可以在启动docker daemon的时候使用<code> --bridge==BRIDGE</code>参数指定其他网桥。<br>然而这还不够，Docker容器还需要与外网进行相互通信。这里涉及到NAT相关知识。</p>
+<blockquote>
+<ul>
+<li>NAT<br>网络地址转换，就是替换IP报文头部的地址信息。NAT通常部署在一个组织的网络出口位置，通过将内部网络IP地址替换为出口的IP地址，提供公网可达性和上层协议的链接地址。（<a target="_blank" rel="noopener" href="https://www.zhihu.com/question/31332694">请参考：NAT相关科普</a>）</li>
+<li>SNAT<br>源地址转换即内网地址向外访问时，发起访问的内网ip地址转换为指定的ip地址（可指定具体的服务以及相应的端口或端口范围），这可以使内网中使用保留ip地址的主机访问外部网络，即内网的多部主机可以通过一个有效的公网ip地址访问外部网络。</li>
+</ul>
+</blockquote>
+<p>使用<code>iptables -t nat -vnL</code>指令查看宿主机NAT表。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/6810620-2a4faa72585b3bb5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="宿主机iptables表部分截图"></p>
+<p>查看规则：<br><code>2051  125K MASQUERADE  all  --  *      !docker0  172.17.0.0/16        0.0.0.0/0 </code><br>这条规则就关系着Docker容器与外界的通信，含义为将源地址为172.17.0.0&#x2F;16的数据包（就是docker容器中发出的数据），如果不是从docker0网卡发出时，做SNAT转换，将IP包的源地址替换为相应网卡的地址。<br>对于外界来说，从docker容器内发出的请求，和宿主机发出的请求相同。</p>
+<p>外界想要访问Docker容器的服务呢？<br>在启动docker容器时，我们使用 <code>-p</code>参数指定端口，这时其实是在iptables中添加了规则，如下图所示：</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/6810620-440166ee3f148b3a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="宿主机iptables表部分截图"></p>
+<p>DNAT规则，将发送到宿主机的流量转发到真正提供服务的容器IP端口上。</p>
+<h2 id="host模式"><a href="#host模式" class="headerlink" title="host模式"></a>host模式</h2><p>Docker容器与宿主机使用相同的网络环境，直接使用宿主机的IP和端口及其他网络设备。这样虽然避免了很多桥接带来的网络问题，但同时也容易造成网络环境的混淆和冲突，比如端口被占用等。不推荐。</p>
+<h2 id="container"><a href="#container" class="headerlink" title="container"></a>container</h2><p>指定与某一容器共享网络。</p>
+<h2 id="none"><a href="#none" class="headerlink" title="none"></a>none</h2><p>不配置任何网络。</p>
+<h3 id="–link"><a href="#–link" class="headerlink" title="–link"></a>–link</h3><p>docker容器之间还可以通过<code>--link</code>阐述进行通信，当提供服务的容器只希望个别容器能够访问时，我们可以使用该指令，提供更为高效、安全的连接方式。</p>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>对Linux虚拟网络基础知识的简单学习后，有助于理清楚下一步排查问题思路。<br>下一篇博客将介绍目前遇到问题时的排查思路和解决方案，并列举一些常用工具。</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/about/">About</a></li>
+        
+          <li><a href="/archives/">archives</a></li>
+        
+          <li><a href="/tags/">Tag</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Linux%E7%BD%91%E7%BB%9C%E8%99%9A%E6%8B%9F%E5%8C%96%E5%9F%BA%E7%A1%80"><span class="toc-number">1.</span> <span class="toc-text">Linux网络虚拟化基础</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Network-Namespace"><span class="toc-number">1.1.</span> <span class="toc-text">Network Namespace</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Veth-Pair%EF%BC%88Virtual-Ethernet-Pair%EF%BC%89"><span class="toc-number">1.2.</span> <span class="toc-text">Veth Pair（Virtual Ethernet Pair）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Bridge-%E7%BD%91%E6%A1%A5"><span class="toc-number">1.3.</span> <span class="toc-text">Bridge 网桥</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#iptables-Netfilter"><span class="toc-number">1.4.</span> <span class="toc-text">iptables&#x2F;Netfilter</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Docker%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80"><span class="toc-number">2.</span> <span class="toc-text">Docker网络基础</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Bridge-%E6%A1%A5%E6%8E%A5%E6%A8%A1%E5%BC%8F"><span class="toc-number">2.1.</span> <span class="toc-text">Bridge 桥接模式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#host%E6%A8%A1%E5%BC%8F"><span class="toc-number">2.2.</span> <span class="toc-text">host模式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#container"><span class="toc-number">2.3.</span> <span class="toc-text">container</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#none"><span class="toc-number">2.4.</span> <span class="toc-text">none</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E2%80%93link"><span class="toc-number">2.4.1.</span> <span class="toc-text">–link</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%B0%8F%E7%BB%93"><span class="toc-number">3.</span> <span class="toc-text">小结</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2020/06/30/Linux%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%EF%BC%9ADocker%E7%BD%91%E7%BB%9C%E7%9F%A5%E8%AF%86%E4%B9%8B%E5%9F%BA%E7%A1%80%E7%AF%87/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2020/06/30/Linux%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%EF%BC%9ADocker%E7%BD%91%E7%BB%9C%E7%9F%A5%E8%AF%86%E4%B9%8B%E5%9F%BA%E7%A1%80%E7%AF%87/&text=Linux虚拟网络：Docker网络知识之基础篇"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2020/06/30/Linux%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%EF%BC%9ADocker%E7%BD%91%E7%BB%9C%E7%9F%A5%E8%AF%86%E4%B9%8B%E5%9F%BA%E7%A1%80%E7%AF%87/&title=Linux虚拟网络：Docker网络知识之基础篇"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2020/06/30/Linux%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%EF%BC%9ADocker%E7%BD%91%E7%BB%9C%E7%9F%A5%E8%AF%86%E4%B9%8B%E5%9F%BA%E7%A1%80%E7%AF%87/&is_video=false&description=Linux虚拟网络：Docker网络知识之基础篇"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Linux虚拟网络：Docker网络知识之基础篇&body=Check out this article: http://example.com/2020/06/30/Linux%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%EF%BC%9ADocker%E7%BD%91%E7%BB%9C%E7%9F%A5%E8%AF%86%E4%B9%8B%E5%9F%BA%E7%A1%80%E7%AF%87/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2020/06/30/Linux%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%EF%BC%9ADocker%E7%BD%91%E7%BB%9C%E7%9F%A5%E8%AF%86%E4%B9%8B%E5%9F%BA%E7%A1%80%E7%AF%87/&title=Linux虚拟网络：Docker网络知识之基础篇"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2020/06/30/Linux%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%EF%BC%9ADocker%E7%BD%91%E7%BB%9C%E7%9F%A5%E8%AF%86%E4%B9%8B%E5%9F%BA%E7%A1%80%E7%AF%87/&title=Linux虚拟网络：Docker网络知识之基础篇"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2020/06/30/Linux%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%EF%BC%9ADocker%E7%BD%91%E7%BB%9C%E7%9F%A5%E8%AF%86%E4%B9%8B%E5%9F%BA%E7%A1%80%E7%AF%87/&title=Linux虚拟网络：Docker网络知识之基础篇"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2020/06/30/Linux%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%EF%BC%9ADocker%E7%BD%91%E7%BB%9C%E7%9F%A5%E8%AF%86%E4%B9%8B%E5%9F%BA%E7%A1%80%E7%AF%87/&title=Linux虚拟网络：Docker网络知识之基础篇"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2020/06/30/Linux%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%EF%BC%9ADocker%E7%BD%91%E7%BB%9C%E7%9F%A5%E8%AF%86%E4%B9%8B%E5%9F%BA%E7%A1%80%E7%AF%87/&name=Linux虚拟网络：Docker网络知识之基础篇&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2020/06/30/Linux%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C%EF%BC%9ADocker%E7%BD%91%E7%BB%9C%E7%9F%A5%E8%AF%86%E4%B9%8B%E5%9F%BA%E7%A1%80%E7%AF%87/&t=Linux虚拟网络：Docker网络知识之基础篇"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2024
+    Ygria
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">archives</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tag</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

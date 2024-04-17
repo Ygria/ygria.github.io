@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="背景：应用系统中存在多个创建实体表单，表单填写时，在填写中文名称后，要填写对应的英文名作为标识或数据库查询索引。 需求：填写中文名的同时，系统自动生成英文名并填充到表单中，辅助用户操作，节约操作时间。  实现效果  方案调研对需求进行分析后，对于如何将中文名翻译成英文字符串，调研以下方案：  调用翻译引擎优点：翻译准确，对于短句也能翻译缺点：部署难度大，需要捆绑翻译引擎 调用开放API（谷歌翻译">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vue 指令实现自动填充英文名功能">
+<meta property="og:url" content="http://example.com/2021/05/21/Vue%20%E6%8C%87%E4%BB%A4%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%8A%A8%E5%A1%AB%E5%85%85%E8%8B%B1%E6%96%87%E5%90%8D%E5%8A%9F%E8%83%BD/index.html">
+<meta property="og:site_name" content="孤光自照">
+<meta property="og:description" content="背景：应用系统中存在多个创建实体表单，表单填写时，在填写中文名称后，要填写对应的英文名作为标识或数据库查询索引。 需求：填写中文名的同时，系统自动生成英文名并填充到表单中，辅助用户操作，节约操作时间。  实现效果  方案调研对需求进行分析后，对于如何将中文名翻译成英文字符串，调研以下方案：  调用翻译引擎优点：翻译准确，对于短句也能翻译缺点：部署难度大，需要捆绑翻译引擎 调用开放API（谷歌翻译">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/28c3278af86760a4e9fa3a04588173b9.gif">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/85a002b82a346a8bd03fd6d9f3161673.gif">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/img_convert/fa9079117854ffa7932e6bde2dfd9665.png">
+<meta property="article:published_time" content="2021-05-20T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-04-17T13:21:57.000Z">
+<meta property="article:author" content="Ygria">
+<meta property="article:tag" content="编程">
+<meta property="article:tag" content="前端">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/img_convert/28c3278af86760a4e9fa3a04588173b9.gif">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Vue 指令实现自动填充英文名功能</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">archives</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tag</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2021/07/08/JavaScript%20ES6%20%20%E4%BD%BF%E7%94%A8%E5%B1%95%E5%BC%80%E8%BF%90%E7%AE%97%E7%AC%A6%E5%AE%8C%E6%88%90%E5%85%A8%E5%B9%B3%E5%8F%B0%E6%A0%A1%E9%AA%8C%E9%87%8D%E5%90%8D%E9%80%BB%E8%BE%91%E5%B0%81%E8%A3%85/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2021/04/28/Java%20%E4%BD%BF%E7%94%A8OpenFeign%E7%AE%A1%E7%90%86%E5%A4%9A%E4%B8%AA%E7%AC%AC%E4%B8%89%E6%96%B9%E6%9C%8D%E5%8A%A1%E8%B0%83%E7%94%A8/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2021/05/21/Vue%20%E6%8C%87%E4%BB%A4%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%8A%A8%E5%A1%AB%E5%85%85%E8%8B%B1%E6%96%87%E5%90%8D%E5%8A%9F%E8%83%BD/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2021/05/21/Vue%20%E6%8C%87%E4%BB%A4%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%8A%A8%E5%A1%AB%E5%85%85%E8%8B%B1%E6%96%87%E5%90%8D%E5%8A%9F%E8%83%BD/&text=Vue 指令实现自动填充英文名功能"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2021/05/21/Vue%20%E6%8C%87%E4%BB%A4%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%8A%A8%E5%A1%AB%E5%85%85%E8%8B%B1%E6%96%87%E5%90%8D%E5%8A%9F%E8%83%BD/&title=Vue 指令实现自动填充英文名功能"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2021/05/21/Vue%20%E6%8C%87%E4%BB%A4%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%8A%A8%E5%A1%AB%E5%85%85%E8%8B%B1%E6%96%87%E5%90%8D%E5%8A%9F%E8%83%BD/&is_video=false&description=Vue 指令实现自动填充英文名功能"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Vue 指令实现自动填充英文名功能&body=Check out this article: http://example.com/2021/05/21/Vue%20%E6%8C%87%E4%BB%A4%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%8A%A8%E5%A1%AB%E5%85%85%E8%8B%B1%E6%96%87%E5%90%8D%E5%8A%9F%E8%83%BD/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2021/05/21/Vue%20%E6%8C%87%E4%BB%A4%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%8A%A8%E5%A1%AB%E5%85%85%E8%8B%B1%E6%96%87%E5%90%8D%E5%8A%9F%E8%83%BD/&title=Vue 指令实现自动填充英文名功能"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2021/05/21/Vue%20%E6%8C%87%E4%BB%A4%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%8A%A8%E5%A1%AB%E5%85%85%E8%8B%B1%E6%96%87%E5%90%8D%E5%8A%9F%E8%83%BD/&title=Vue 指令实现自动填充英文名功能"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2021/05/21/Vue%20%E6%8C%87%E4%BB%A4%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%8A%A8%E5%A1%AB%E5%85%85%E8%8B%B1%E6%96%87%E5%90%8D%E5%8A%9F%E8%83%BD/&title=Vue 指令实现自动填充英文名功能"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2021/05/21/Vue%20%E6%8C%87%E4%BB%A4%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%8A%A8%E5%A1%AB%E5%85%85%E8%8B%B1%E6%96%87%E5%90%8D%E5%8A%9F%E8%83%BD/&title=Vue 指令实现自动填充英文名功能"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2021/05/21/Vue%20%E6%8C%87%E4%BB%A4%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%8A%A8%E5%A1%AB%E5%85%85%E8%8B%B1%E6%96%87%E5%90%8D%E5%8A%9F%E8%83%BD/&name=Vue 指令实现自动填充英文名功能&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2021/05/21/Vue%20%E6%8C%87%E4%BB%A4%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%8A%A8%E5%A1%AB%E5%85%85%E8%8B%B1%E6%96%87%E5%90%8D%E5%8A%9F%E8%83%BD/&t=Vue 指令实现自动填充英文名功能"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0%E6%95%88%E6%9E%9C"><span class="toc-number">1.</span> <span class="toc-text">实现效果</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%96%B9%E6%A1%88%E8%B0%83%E7%A0%94"><span class="toc-number">2.</span> <span class="toc-text">方案调研</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0%E6%96%B9%E6%A1%88"><span class="toc-number">3.</span> <span class="toc-text">实现方案</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0"><span class="toc-number">4.</span> <span class="toc-text">代码实现</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8C%87%E4%BB%A4%E5%AE%9A%E4%B9%89"><span class="toc-number">4.1.</span> <span class="toc-text">指令定义</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="toc-number">4.2.</span> <span class="toc-text">注意事项</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8C%87%E4%BB%A4%E4%BD%BF%E7%94%A8"><span class="toc-number">4.3.</span> <span class="toc-text">指令使用</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">5.</span> <span class="toc-text">总结</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        Vue 指令实现自动填充英文名功能
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Ygria</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2021-05-20T16:00:00.000Z" class="dt-published" itemprop="datePublished">2021-05-21</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a>, <a class="p-category" href="/tags/%E7%BC%96%E7%A8%8B/" rel="tag">编程</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <ul>
+<li>背景：应用系统中存在多个创建实体表单，表单填写时，在填写中文名称后，要填写对应的英文名作为标识或数据库查询索引。</li>
+<li>需求：<strong>填写中文名的同时，系统自动生成英文名并填充到表单中，辅助用户操作，节约操作时间。</strong></li>
+</ul>
+<h1 id="实现效果"><a href="#实现效果" class="headerlink" title="实现效果"></a>实现效果</h1><p><img src="https://img-blog.csdnimg.cn/img_convert/28c3278af86760a4e9fa3a04588173b9.gif" alt="转全拼"></p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/85a002b82a346a8bd03fd6d9f3161673.gif" alt="转英文（伪）"></p>
+<h1 id="方案调研"><a href="#方案调研" class="headerlink" title="方案调研"></a>方案调研</h1><p>对需求进行分析后，对于如何将中文名翻译成英文字符串，调研以下方案：</p>
+<ul>
+<li>调用翻译引擎<br>优点：翻译准确，对于短句也能翻译<br>缺点：部署难度大，需要捆绑翻译引擎</li>
+<li>调用开放API（谷歌翻译&#x2F;百度翻译等）<br>优点：能完成翻译功能<br>缺点：可能需要付费&#x2F;开发者帐号等，需要集成成本，需要私有化部署版本时（无法连接外网）可能无法实现</li>
+<li>使用音译插件（参考：<a target="_blank" rel="noopener" href="https://github.com/dzcpy/transliteration%EF%BC%89">https://github.com/dzcpy/transliteration）</a><br>优点：轻量，集成简单，有一定可扩展性，可离线<br>缺点：无法翻译，只能音译（会将“你好”翻译成“ni_hao”而不是“hello”），使标识的可读性和语义性下降。</li>
+</ul>
+<p>以上三种仅为中转英的方法不同，均可实现功能。本次方案暂使用第三种。</p>
+<h1 id="实现方案"><a href="#实现方案" class="headerlink" title="实现方案"></a>实现方案</h1><ul>
+<li>分析：该功能需要增加到多个表单中，如果为每个需要添加的组件都增加相应逻辑，侵入性较强，也不好维护。</li>
+<li>逻辑提炼：</li>
+</ul>
+<ol>
+<li>为中文名的输入框绑定监听事件，监听输入，取得该input框输入的值</li>
+<li>将第一步中获得的中文值转化成英文字符串</li>
+<li>将英文字符串写入到英文名输入框中<br>思路： 为表单添加<code>vue</code>自定义指令，通过取子节点（根据虚拟节点层级，<code>vnode</code>的子级）的方法，获取到需要操作的dom元素，再在指令逻辑中进行逻辑处理。</li>
+</ol>
+<h1 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h1><h2 id="指令定义"><a href="#指令定义" class="headerlink" title="指令定义"></a>指令定义</h2><ul>
+<li>定义<code>v-transliterate </code>指令（vue自定义指令的定义和使用可参考官方文档，此处不做赘述）</li>
+<li><code>transliterate.js</code><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; transliterate <span class="keyword">as</span> tr, slugify &#125; <span class="keyword">from</span> <span class="string">&#x27;transliteration&#x27;</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span><br><span class="line">  <span class="title function_">inserted</span>(<span class="params">el, binding, vnode</span>) &#123;</span><br><span class="line">    <span class="keyword">let</span> sourceInputEl = vnode.<span class="property">componentInstance</span>.<span class="property">$children</span>.<span class="title function_">find</span>(<span class="function"><span class="params">item</span> =&gt;</span> item.<span class="property">prop</span> === <span class="string">&#x27;name&#x27;</span>).<span class="property">$children</span>[<span class="number">1</span>].<span class="property">$el</span>.<span class="property">children</span>[<span class="number">0</span>]</span><br><span class="line">    <span class="keyword">let</span> targetInputEl = vnode.<span class="property">componentInstance</span>.<span class="property">$children</span>.<span class="title function_">find</span>(<span class="function"><span class="params">item</span> =&gt;</span> item.<span class="property">prop</span> === <span class="string">&#x27;key&#x27;</span>).<span class="property">$children</span>[<span class="number">1</span>].<span class="property">$el</span>.<span class="property">children</span>[<span class="number">0</span>]</span><br><span class="line"></span><br><span class="line">    <span class="keyword">let</span> isFirstInput = <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line">    sourceInputEl.<span class="title function_">addEventListener</span>(<span class="string">&#x27;keyup&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">      <span class="comment">// 判断当前标识是否已填写，若已填写，则不再根据中文名称生成</span></span><br><span class="line">      <span class="keyword">let</span> isEmpty = !targetInputEl.<span class="property">value</span>;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (isEmpty || !isFirstInput) &#123;</span><br><span class="line">    <span class="comment">// 一定延迟处理，用户使用几乎无感知</span></span><br><span class="line">        <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">          <span class="keyword">let</span> transValue = <span class="title function_">slugify</span>(sourceInputEl.<span class="property">value</span>, &#123; <span class="attr">separator</span>: <span class="string">&#x27;_&#x27;</span> &#125;);</span><br><span class="line">          <span class="keyword">let</span> inputEvt = <span class="keyword">new</span> <span class="title class_">InputEvent</span>(<span class="string">&#x27;input&#x27;</span>, &#123;</span><br><span class="line">            <span class="attr">inputType</span>: <span class="string">&#x27;insertText&#x27;</span>,</span><br><span class="line">            <span class="attr">data</span>: transValue,</span><br><span class="line">            <span class="attr">dataTransfer</span>: <span class="literal">null</span>,</span><br><span class="line">            <span class="attr">isComposing</span>: <span class="literal">false</span></span><br><span class="line">          &#125;);</span><br><span class="line">          targetInputEl.<span class="property">value</span> = transValue;</span><br><span class="line">          targetInputEl.<span class="title function_">dispatchEvent</span>(inputEvt);</span><br><span class="line">          isFirstInput = <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">        &#125;, <span class="number">500</span>);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;)</span><br><span class="line"></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h2><p>1、transValue的生成可根据前面所说的不同方案，更改生成的方法。<br>2、两个input 元素是根据prop来筛选的，代码中硬编码为”name“ -中文名 和”key“ 英文名，可根据需求调整，也可以根据指令方法入参的binding赋值。由于本项目中所有表单prop都是固定的，所以没有写相应逻辑。<br>3、<code>keyup</code>事件可根据需求更改为<code>blur</code>事件，对于调用后台api获值，可考虑改为blur，降低频繁请求。<br>4、执行<code> targetInputEl.value = transValue;</code>  后，页面上显示已经改变，但点击保存表单时仍然会触发空值校验，怀疑是因为该赋值没有刷新到虚拟节点的model中，故而使用 <code>targetInputEl.dispatchEvent(inputEvt);</code>方法模拟输入事件，触发值的刷新。<br>5、<code>isEmpty</code>  空值校验，避免用户在填写表单时先填写了英文名，再填写中文名时，英文名被覆盖。逻辑一般限定标识生成后就不允许修改，该方法也规避了修改时的英文名跟着中文名修改的问题。<br>6、使用<code>transliterate </code>可定义配置字典，实现常用中-英单词的翻译，但仍然无法替代翻译引擎。配置逻辑参考github上的README即可。<br><code>slugify.config(&#123; replace: [[&#39;世界&#39;,&#39;world&#39;],[&#39;你好&#39;,&#39;hello&#39;]] &#125;);</code></p>
+<h2 id="指令使用"><a href="#指令使用" class="headerlink" title="指令使用"></a>指令使用</h2><p>需要用该功能的地方，在表单元素增加该指令即可。<br><img src="https://img-blog.csdnimg.cn/img_convert/fa9079117854ffa7932e6bde2dfd9665.png" alt="指令使用"></p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>以上就是实现全过程，如果有更好的实现方法，请留言告诉我哦~</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/about/">About</a></li>
+        
+          <li><a href="/archives/">archives</a></li>
+        
+          <li><a href="/tags/">Tag</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0%E6%95%88%E6%9E%9C"><span class="toc-number">1.</span> <span class="toc-text">实现效果</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%96%B9%E6%A1%88%E8%B0%83%E7%A0%94"><span class="toc-number">2.</span> <span class="toc-text">方案调研</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0%E6%96%B9%E6%A1%88"><span class="toc-number">3.</span> <span class="toc-text">实现方案</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0"><span class="toc-number">4.</span> <span class="toc-text">代码实现</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8C%87%E4%BB%A4%E5%AE%9A%E4%B9%89"><span class="toc-number">4.1.</span> <span class="toc-text">指令定义</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="toc-number">4.2.</span> <span class="toc-text">注意事项</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8C%87%E4%BB%A4%E4%BD%BF%E7%94%A8"><span class="toc-number">4.3.</span> <span class="toc-text">指令使用</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">5.</span> <span class="toc-text">总结</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2021/05/21/Vue%20%E6%8C%87%E4%BB%A4%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%8A%A8%E5%A1%AB%E5%85%85%E8%8B%B1%E6%96%87%E5%90%8D%E5%8A%9F%E8%83%BD/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2021/05/21/Vue%20%E6%8C%87%E4%BB%A4%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%8A%A8%E5%A1%AB%E5%85%85%E8%8B%B1%E6%96%87%E5%90%8D%E5%8A%9F%E8%83%BD/&text=Vue 指令实现自动填充英文名功能"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2021/05/21/Vue%20%E6%8C%87%E4%BB%A4%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%8A%A8%E5%A1%AB%E5%85%85%E8%8B%B1%E6%96%87%E5%90%8D%E5%8A%9F%E8%83%BD/&title=Vue 指令实现自动填充英文名功能"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2021/05/21/Vue%20%E6%8C%87%E4%BB%A4%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%8A%A8%E5%A1%AB%E5%85%85%E8%8B%B1%E6%96%87%E5%90%8D%E5%8A%9F%E8%83%BD/&is_video=false&description=Vue 指令实现自动填充英文名功能"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Vue 指令实现自动填充英文名功能&body=Check out this article: http://example.com/2021/05/21/Vue%20%E6%8C%87%E4%BB%A4%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%8A%A8%E5%A1%AB%E5%85%85%E8%8B%B1%E6%96%87%E5%90%8D%E5%8A%9F%E8%83%BD/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2021/05/21/Vue%20%E6%8C%87%E4%BB%A4%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%8A%A8%E5%A1%AB%E5%85%85%E8%8B%B1%E6%96%87%E5%90%8D%E5%8A%9F%E8%83%BD/&title=Vue 指令实现自动填充英文名功能"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2021/05/21/Vue%20%E6%8C%87%E4%BB%A4%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%8A%A8%E5%A1%AB%E5%85%85%E8%8B%B1%E6%96%87%E5%90%8D%E5%8A%9F%E8%83%BD/&title=Vue 指令实现自动填充英文名功能"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2021/05/21/Vue%20%E6%8C%87%E4%BB%A4%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%8A%A8%E5%A1%AB%E5%85%85%E8%8B%B1%E6%96%87%E5%90%8D%E5%8A%9F%E8%83%BD/&title=Vue 指令实现自动填充英文名功能"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2021/05/21/Vue%20%E6%8C%87%E4%BB%A4%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%8A%A8%E5%A1%AB%E5%85%85%E8%8B%B1%E6%96%87%E5%90%8D%E5%8A%9F%E8%83%BD/&title=Vue 指令实现自动填充英文名功能"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2021/05/21/Vue%20%E6%8C%87%E4%BB%A4%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%8A%A8%E5%A1%AB%E5%85%85%E8%8B%B1%E6%96%87%E5%90%8D%E5%8A%9F%E8%83%BD/&name=Vue 指令实现自动填充英文名功能&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2021/05/21/Vue%20%E6%8C%87%E4%BB%A4%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%8A%A8%E5%A1%AB%E5%85%85%E8%8B%B1%E6%96%87%E5%90%8D%E5%8A%9F%E8%83%BD/&t=Vue 指令实现自动填充英文名功能"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2024
+    Ygria
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">archives</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tag</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

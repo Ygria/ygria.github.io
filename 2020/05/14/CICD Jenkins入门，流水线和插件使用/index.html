@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="最近，我们使用的开发服务器被回收了，换了一台新的服务器，CI&#x2F;CD平台需要重新搭建。我的运维能力一直薄弱，所以借此机会学习了一番如何使用Jenkins进行持续集成开发和部署，实践并踩了一些坑，在此记录一下。 引言假如没有CI&#x2F;CD平台 想要部署到服务器，我们需要本地打包上传至服务器，或上传源码至服务器上打包，覆盖原来的安装包，进行部署。 当所需要部署的只是一个jar包或者只是一">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CICD：Jenkins入门，流水线和插件使用">
+<meta property="og:url" content="http://example.com/2020/05/14/CICD%20Jenkins%E5%85%A5%E9%97%A8%EF%BC%8C%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%92%8C%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/index.html">
+<meta property="og:site_name" content="孤光自照">
+<meta property="og:description" content="最近，我们使用的开发服务器被回收了，换了一台新的服务器，CI&#x2F;CD平台需要重新搭建。我的运维能力一直薄弱，所以借此机会学习了一番如何使用Jenkins进行持续集成开发和部署，实践并踩了一些坑，在此记录一下。 引言假如没有CI&#x2F;CD平台 想要部署到服务器，我们需要本地打包上传至服务器，或上传源码至服务器上打包，覆盖原来的安装包，进行部署。 当所需要部署的只是一个jar包或者只是一">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152739.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152753.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152811.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152823.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152841.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152856.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152911.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152931.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152952.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153012.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153033.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153042.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153056.png">
+<meta property="article:published_time" content="2020-05-13T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-04-17T13:21:57.000Z">
+<meta property="article:author" content="Ygria">
+<meta property="article:tag" content="编程">
+<meta property="article:tag" content="运维">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152739.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>CICD：Jenkins入门，流水线和插件使用</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">archives</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tag</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2020/05/23/vue-codemirror%20+%20Java%20Compiler%E5%AE%9E%E7%8E%B0Java%20Web%20IDE/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2020/05/08/Java%EF%BC%9A%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B3%A8%E8%A7%A3+%E5%8F%8D%E5%B0%84%E5%AE%9E%E7%8E%B0%E5%AF%BC%E5%85%A5%E5%AF%BC%E5%87%BAExcel%E6%96%87%E6%A1%A3/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2020/05/14/CICD%20Jenkins%E5%85%A5%E9%97%A8%EF%BC%8C%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%92%8C%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2020/05/14/CICD%20Jenkins%E5%85%A5%E9%97%A8%EF%BC%8C%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%92%8C%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/&text=CICD：Jenkins入门，流水线和插件使用"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2020/05/14/CICD%20Jenkins%E5%85%A5%E9%97%A8%EF%BC%8C%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%92%8C%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/&title=CICD：Jenkins入门，流水线和插件使用"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2020/05/14/CICD%20Jenkins%E5%85%A5%E9%97%A8%EF%BC%8C%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%92%8C%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/&is_video=false&description=CICD：Jenkins入门，流水线和插件使用"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=CICD：Jenkins入门，流水线和插件使用&body=Check out this article: http://example.com/2020/05/14/CICD%20Jenkins%E5%85%A5%E9%97%A8%EF%BC%8C%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%92%8C%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2020/05/14/CICD%20Jenkins%E5%85%A5%E9%97%A8%EF%BC%8C%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%92%8C%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/&title=CICD：Jenkins入门，流水线和插件使用"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2020/05/14/CICD%20Jenkins%E5%85%A5%E9%97%A8%EF%BC%8C%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%92%8C%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/&title=CICD：Jenkins入门，流水线和插件使用"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2020/05/14/CICD%20Jenkins%E5%85%A5%E9%97%A8%EF%BC%8C%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%92%8C%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/&title=CICD：Jenkins入门，流水线和插件使用"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2020/05/14/CICD%20Jenkins%E5%85%A5%E9%97%A8%EF%BC%8C%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%92%8C%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/&title=CICD：Jenkins入门，流水线和插件使用"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2020/05/14/CICD%20Jenkins%E5%85%A5%E9%97%A8%EF%BC%8C%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%92%8C%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/&name=CICD：Jenkins入门，流水线和插件使用&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2020/05/14/CICD%20Jenkins%E5%85%A5%E9%97%A8%EF%BC%8C%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%92%8C%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/&t=CICD：Jenkins入门，流水线和插件使用"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BC%95%E8%A8%80"><span class="toc-number">1.</span> <span class="toc-text">引言</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%81%87%E5%A6%82%E6%B2%A1%E6%9C%89CI-CD%E5%B9%B3%E5%8F%B0"><span class="toc-number">1.1.</span> <span class="toc-text">假如没有CI&#x2F;CD平台</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Jenkins%E5%8F%AF%E4%BB%A5%E5%81%9A%E4%BB%80%E4%B9%88"><span class="toc-number">2.</span> <span class="toc-text">Jenkins可以做什么</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Jenkins%E6%90%AD%E5%BB%BA%E4%B8%8E%E9%85%8D%E7%BD%AE"><span class="toc-number">3.</span> <span class="toc-text">Jenkins搭建与配置</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1%E3%80%81%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87"><span class="toc-number">3.1.</span> <span class="toc-text">1、环境准备</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2%E3%80%81%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B"><span class="toc-number">3.2.</span> <span class="toc-text">2、快速开始</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3%E3%80%81%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="toc-number">3.3.</span> <span class="toc-text">3、初始化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4%E3%80%81%E6%96%B0%E5%BB%BA%E5%A3%B0%E6%98%8E%E5%BC%8F%E6%B5%81%E6%B0%B4%E7%BA%BF"><span class="toc-number">3.4.</span> <span class="toc-text">4、新建声明式流水线</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5%E3%80%81%E5%B8%B8%E7%94%A8%E6%B5%81%E6%B0%B4%E7%BA%BF-%E5%B7%A5%E5%85%B7-%E6%8F%92%E4%BB%B6-%E4%BD%BF%E7%94%A8%E5%8F%8A%E9%85%8D%E7%BD%AE"><span class="toc-number">3.5.</span> <span class="toc-text">5、常用流水线 + 工具 +插件 使用及配置</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E9%9B%86%E6%88%90git-gitlab"><span class="toc-number">3.5.1.</span> <span class="toc-text">一、集成git&#x2F;gitlab</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C%E3%80%81maven-nodeJS%E7%AD%89%E6%9E%84%E5%BB%BA%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8"><span class="toc-number">3.5.2.</span> <span class="toc-text">二、maven&#x2F;nodeJS等构建工具使用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E8%BF%9E%E6%8E%A5%E5%85%B6%E4%BB%96%E6%9C%BA%E5%99%A8-%E6%89%A7%E8%A1%8C%E8%84%9A%E6%9C%AC"><span class="toc-number">3.5.3.</span> <span class="toc-text">三、连接其他机器&#x2F;执行脚本</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E9%9B%86%E6%88%90docker"><span class="toc-number">3.5.4.</span> <span class="toc-text">四、集成docker</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E7%94%9F%E6%88%90%E5%BD%92%E6%A1%A3%E6%96%87%E4%BB%B6"><span class="toc-number">3.5.5.</span> <span class="toc-text">五、生成归档文件</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%85%B6%E4%BB%96%EF%BC%88%E5%BE%85%E8%A1%A5%E5%85%85%EF%BC%89"><span class="toc-number">4.</span> <span class="toc-text">其他（待补充）</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        CICD：Jenkins入门，流水线和插件使用
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Ygria</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2020-05-13T16:00:00.000Z" class="dt-published" itemprop="datePublished">2020-05-14</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/%E7%BC%96%E7%A8%8B/" rel="tag">编程</a>, <a class="p-category" href="/tags/%E8%BF%90%E7%BB%B4/" rel="tag">运维</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <p>最近，我们使用的开发服务器被回收了，换了一台新的服务器，CI&#x2F;CD平台需要重新搭建。<br>我的运维能力一直薄弱，所以借此机会学习了一番如何使用Jenkins进行持续集成开发和部署，实践并踩了一些坑，在此记录一下。</p>
+<h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><h2 id="假如没有CI-CD平台"><a href="#假如没有CI-CD平台" class="headerlink" title="假如没有CI&#x2F;CD平台"></a>假如没有CI&#x2F;CD平台</h2><p> 想要部署到服务器，我们需要本地打包上传至服务器，或上传源码至服务器上打包，覆盖原来的安装包，进行部署。</p>
+<p>当所需要部署的只是一个jar包或者只是一个服务，并且代码不经常更新，这样是可以的。但是开发过程中，更常见的是代码经常迭代更新，并且项目中有多个组件。<br>这带来了大量的机械重复劳动，打包、上传、构建、测试、发布，如果都由人工操作，很容易混淆代码版本、不易跟踪异常。如果代码有多个分支版本，需要应对多个测试&#x2F;生产环境，劳动量会指数级别飙升，到人无法承受的地步。<br>而Jenkins提供了解决方案，使我们可以一劳永逸地应对部署。</p>
+<h1 id="Jenkins可以做什么"><a href="#Jenkins可以做什么" class="headerlink" title="Jenkins可以做什么"></a>Jenkins可以做什么</h1><p>它的流水线操作正如其名，将机械的工作流程提炼出来，重复执行，可以定义成定时操作，可以定义触发条件，可以填写参数，可以写入控制语句。<br>代替我们完成：<br>1、拉取源码至服务器（与代码管理平台直接集成，可集成gitlab&#x2F;svn等）<br>2、打包源码（可选择使用maven、nodeJS等等打包工具）<br>3、测试<br>4、准备环境<br>5、发布<br>总之，一切需要的工作，都可以定义成流水线里的一个流程。</p>
+<h1 id="Jenkins搭建与配置"><a href="#Jenkins搭建与配置" class="headerlink" title="Jenkins搭建与配置"></a>Jenkins搭建与配置</h1><p>本次安装的Jenkins是Jenkins中文社区提供的中文镜像版，不仅做了汉化，Jenkins可以灵活使用的1500多个插件也提供了国内的镜像地址，安装只需要一条docker指令。</p>
+<h2 id="1、环境准备"><a href="#1、环境准备" class="headerlink" title="1、环境准备"></a>1、环境准备</h2><p>1、查看系统版本，预留空间和Jenkins运行端口<br>2、安装docker</p>
+<h2 id="2、快速开始"><a href="#2、快速开始" class="headerlink" title="2、快速开始"></a>2、快速开始</h2><ul>
+<li>创建容器</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -d -v /jenkins_home:/var/jenkins_home -u 0 -p 8786:8080  --name jenkins jenkinszh/jenkins-zh</span><br></pre></td></tr></table></figure>
+
+<p><strong>指令解释：</strong><br><code>-d</code>： 后台运行<br><code>-v</code>：将Jenkins主目录挂在出来<br><code>-u 0</code> ：将系统用户传入（0为root用户），避免一些权限问题<br><code>-p</code> ：指定映射到宿主机的端口，如果8786端口被占用也可以使用其他端口<br><code>--name</code>：指定运行容器名称为jenkins<br><code>jenkinszh/jenkins-zh</code> Jenkins中文社区提供的镜像名称，docker会检测本地有无该镜像，如果没有，会自动拉取。</p>
+<ul>
+<li><code>docker logs jenkins </code> 查看日志</li>
+</ul>
+<p>运行之后，访问宿主机ip+ 8786（指定端口），看到Jenkins初始页面。<br><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152739.png" alt="image.png"></p>
+<p>Jenkins创建成功！</p>
+<h2 id="3、初始化"><a href="#3、初始化" class="headerlink" title="3、初始化"></a>3、初始化</h2><p>稍微等待之后，自动跳转至管理员登录页面。<br><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152753.png" alt="image.png"></p>
+<p>创建容器时我们已经将该目录挂载到宿主机了，所以可以直接访问映射出的文件：<br>  <code>cat /jenkins_home/secrets/initialAdminPassword</code></p>
+<p>  也可以使用<code>docker exec</code>指令访问容器内文件:<br>  <code>docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword</code><br>输入密码，登陆进入新手入门页面。</p>
+<p><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152811.png" alt="image.png"></p>
+<p>选择安装推荐插件。<br>如果有安装失败的，可以点击继续，直接跳过，进入Jenkins管理页面，等待后续使用时再进行安装。</p>
+<p><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152823.png" alt="image.png"></p>
+<h2 id="4、新建声明式流水线"><a href="#4、新建声明式流水线" class="headerlink" title="4、新建声明式流水线"></a>4、新建声明式流水线</h2><p>点击左侧新建item，可以创建新的任务，如下图所示。</p>
+<p><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152841.png" alt="image.png"></p>
+<p>选择流水线。</p>
+<p>现在就可以创建流水线，用于部署正在开发的项目了。</p>
+<h2 id="5、常用流水线-工具-插件-使用及配置"><a href="#5、常用流水线-工具-插件-使用及配置" class="headerlink" title="5、常用流水线 + 工具 +插件 使用及配置"></a>5、常用流水线 + 工具 +插件 使用及配置</h2><p>流水线语法请参考：</p>
+<p><a target="_blank" rel="noopener" href="http://jenkins-zh.cn/wechat/articles/2020/05/2020-05-08-how-to-use-the-jenkins-declarative-pipeline/">如何使用声明式流水线</a><br>可以使用Jenkins自带的流水线语句生成工具来辅助编写：</p>
+<p><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152856.png" alt="image.png"></p>
+<p>插件和其他配置均为可选，根据使用需求灵活安装。<br>在此记录一些插件&#x2F;工具，并给出它们在流水线脚本中的使用范例。</p>
+<h3 id="一、集成git-gitlab"><a href="#一、集成git-gitlab" class="headerlink" title="一、集成git&#x2F;gitlab"></a>一、集成git&#x2F;gitlab</h3><ul>
+<li><p>配置凭据用于登陆验证gitlab<br><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152911.png" alt="image.png"></p>
+</li>
+<li><p>参考语法</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">steps &#123;</span><br><span class="line">	git <span class="attr">branch:</span> <span class="string">&#x27;dev&#x27;</span>, <span class="attr">credentialsId:</span> <span class="string">&#x27;***&#x27;</span>, <span class="attr">url:</span> <span class="string">&#x27;https://git.***.git&#x27;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>将创建好的凭据填入。</p>
+</li>
+</ul>
+<h3 id="二、maven-nodeJS等构建工具使用"><a href="#二、maven-nodeJS等构建工具使用" class="headerlink" title="二、maven&#x2F;nodeJS等构建工具使用"></a>二、maven&#x2F;nodeJS等构建工具使用</h3><ul>
+<li><p>工具安装和配置<br> 在全局工具配置中配置NodeJS和Maven<br><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152931.png" alt="image.png"></p>
+</li>
+<li><p>使用maven打包</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">steps &#123;</span><br><span class="line">    script &#123;</span><br><span class="line">     sh <span class="string">&quot;mvn clean install -Dmaven.test.skip=true -Plinux&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure></li>
+<li><p>使用<code>ln -s</code>指令支持脚本中运行<br>若执行时报错无mvn指令（或npm、cnpm等），说明jenkins在&#x2F;usr&#x2F;local&#x2F;bin目录下没有找到相应的指令。可以通过建立软连接方式实现支持。<br><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152952.png" alt="image.png"></p>
+</li>
+</ul>
+<p>可以将宿主机的工具包直接放入挂载目录，进行映射，也可以在工具配置中选择自动下载，在Jenkins内中再次安装。</p>
+<h3 id="三、连接其他机器-执行脚本"><a href="#三、连接其他机器-执行脚本" class="headerlink" title="三、连接其他机器&#x2F;执行脚本"></a>三、连接其他机器&#x2F;执行脚本</h3><ul>
+<li>容器内<br>直接使用下列流水线语言格式即可。<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">script &#123;</span><br><span class="line">    sh <span class="string">&quot;***&quot;</span></span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></li>
+<li>执行宿主机内脚本<br>（1）挂载进入容器内部<br>缺点：若脚本运行环境和操作内容是宿主机文件，该方法无法实现。<br>（2）使用ssh</li>
+<li>语句使用<br>开启免密校验，使用<code> sh &quot;ssh -o StrictHostKeyChecking=no -l root $&#123;IP&#125; &#39;****&#39;&quot;</code>格式的指令。<br>注意指令格式为双引号内套单引号，单引号内为希望在宿主机执行的指令</li>
+<li>插件使用</li>
+</ul>
+<ul>
+<li><p><strong>SSH Pipeline Step</strong><br>根据示例，可得，事先添加好凭据之后，很容易在指定ip上（包括宿主机）执行文件传输、脚本执行等操作。</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> host = [:]</span><br><span class="line">host.name = <span class="string">&quot;host&quot;</span></span><br><span class="line">host.host = <span class="string">&quot;&quot;</span></span><br><span class="line">host.allowAnyHosts = <span class="literal">true</span></span><br><span class="line"> </span><br><span class="line">node &#123;</span><br><span class="line">    withCredentials([usernamePassword(<span class="attr">credentialsId:</span> <span class="string">&#x27;&#x27;</span>, <span class="attr">passwordVariable:</span> <span class="string">&#x27;password&#x27;</span>, <span class="attr">usernameVariable:</span> <span class="string">&#x27;userName&#x27;</span>)]) &#123;</span><br><span class="line">        host.user = userName</span><br><span class="line">        host.password = password</span><br><span class="line">        stage(<span class="string">&quot;SSH Steps Rocks!&quot;</span>) &#123;</span><br><span class="line">            writeFile <span class="attr">file:</span> <span class="string">&#x27;test.sh&#x27;</span>, <span class="attr">text:</span> <span class="string">&#x27;ls&#x27;</span></span><br><span class="line">            sshCommand <span class="attr">remote:</span> host, <span class="attr">command:</span> <span class="string">&#x27;for i in &#123;1..5&#125;; do echo -n \&quot;Loop \$i \&quot;; date ; sleep 1; done&#x27;</span></span><br><span class="line">            sshScript <span class="attr">remote:</span> host, <span class="attr">script:</span> <span class="string">&#x27;test.sh&#x27;</span></span><br><span class="line">            sshPut <span class="attr">remote:</span> host, <span class="attr">from:</span> <span class="string">&#x27;test.sh&#x27;</span>, <span class="attr">into:</span> <span class="string">&#x27;.&#x27;</span></span><br><span class="line">            sshGet <span class="attr">remote:</span> host, <span class="attr">from:</span> <span class="string">&#x27;test.sh&#x27;</span>, <span class="attr">into:</span> <span class="string">&#x27;test_new.sh&#x27;</span>, <span class="attr">override:</span> <span class="literal">true</span></span><br><span class="line">            sshRemove <span class="attr">remote:</span> host, <span class="attr">path:</span> <span class="string">&#x27;test.sh&#x27;</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>构建结果<br><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153012.png" alt="image.png"></p>
+</li>
+<li><p><strong>Publish Over SSH</strong><br><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153033.png" alt="image.png"></p>
+</li>
+</ul>
+<p>在Jenkins管理&#x2F;系统管理&#x2F;PublishOverSSH的相关配置中配置所需要的宿主机IP、用户、密码等等信息<br><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153042.png" alt="image.png"></p>
+<p>可以在展开的高级设置中配置SSH服务器。<br>查看<a href="%5Bhttps://plugins.jenkins.io/publish-over-ssh/%5D(https://plugins.jenkins.io/publish-over-ssh/)">Publish-Over-Server 插件说明</a>获取高级用法。</p>
+<h3 id="四、集成docker"><a href="#四、集成docker" class="headerlink" title="四、集成docker"></a>四、集成docker</h3><p>因为我们的Jenkins服务是作为docker容器运行的，所以需要在容器内调用docker命令。<br>容器内调用docker命令有两种：</p>
+<ul>
+<li><p>DinD（Docker in Docker）（不推荐）<br>容器内部再安装一个Docker应用。但是这种方法不推荐，参考：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/27208085">使用 Docker-in-Docker 来运行 CI 或集成测试环境？三思！</a></p>
+</li>
+<li><p><strong>DooD（Docker-outside-of-Docker）（推荐）</strong></p>
+<blockquote>
+<p>原理说明：<br>Docker采用的是Client&#x2F;Server架构，我们常用的docker命令只是docker client，通过该命令行执行命令的时候，实际是通过client与docker engine通信。<br>默认情况下，Docker的守护进程会生成一个socket（<code>/var/run/docker.sock</code>）文件来进行本地进程通信，智是UNIX域套接字，可以通过文件系统（而非网络地址）进行寻址访问。</p>
+</blockquote>
+</li>
+</ul>
+<p>根据上述原理，我们可以通过挂载宿主机socket文件进入Jenkins，使Jenkins可以使用宿主机docker命令。</p>
+<ul>
+<li><strong>直接使用第四点中的SSH用法执行：</strong> <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sshCommand remote: host, command: &#x27;docker *** &#x27;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="五、生成归档文件"><a href="#五、生成归档文件" class="headerlink" title="五、生成归档文件"></a>五、生成归档文件</h3><p>示例：</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">pipeline &#123;</span><br><span class="line">    </span><br><span class="line">    agent any</span><br><span class="line"></span><br><span class="line"> stages &#123;</span><br><span class="line">     </span><br><span class="line">     stage(<span class="string">&quot;build&quot;</span>)&#123;</span><br><span class="line">         steps&#123;</span><br><span class="line">             sh <span class="string">&#x27;touch archive.jar&#x27;</span></span><br><span class="line">         &#125;</span><br><span class="line">         </span><br><span class="line">     &#125;</span><br><span class="line">     </span><br><span class="line">     stage(<span class="string">&#x27;archive&#x27;</span>) &#123;  </span><br><span class="line">            steps &#123;</span><br><span class="line">                archiveArtifacts <span class="attr">artifacts:</span> <span class="string">&#x27;archive.jar&#x27;</span>, <span class="attr">fingerprint:</span> <span class="literal">true</span> </span><br><span class="line">            &#125;</span><br><span class="line">    &#125;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在build过程中生成归档文件，在archive过程中归档。<br><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153056.png" alt="image.png"></p>
+<p>在此页面上可以直接下载归档好的文件。</p>
+<h1 id="其他（待补充）"><a href="#其他（待补充）" class="headerlink" title="其他（待补充）"></a>其他（待补充）</h1><p>1、配置时区<br>打开系统管理&#x2F;命令行，运行：<br><code>System.setProperty(&#39;org.apache.commons.jelly.tags.fmt.timeZone&#39;, &#39;Asia/Shanghai&#39;)</code></p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/about/">About</a></li>
+        
+          <li><a href="/archives/">archives</a></li>
+        
+          <li><a href="/tags/">Tag</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BC%95%E8%A8%80"><span class="toc-number">1.</span> <span class="toc-text">引言</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%81%87%E5%A6%82%E6%B2%A1%E6%9C%89CI-CD%E5%B9%B3%E5%8F%B0"><span class="toc-number">1.1.</span> <span class="toc-text">假如没有CI&#x2F;CD平台</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Jenkins%E5%8F%AF%E4%BB%A5%E5%81%9A%E4%BB%80%E4%B9%88"><span class="toc-number">2.</span> <span class="toc-text">Jenkins可以做什么</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Jenkins%E6%90%AD%E5%BB%BA%E4%B8%8E%E9%85%8D%E7%BD%AE"><span class="toc-number">3.</span> <span class="toc-text">Jenkins搭建与配置</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1%E3%80%81%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87"><span class="toc-number">3.1.</span> <span class="toc-text">1、环境准备</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2%E3%80%81%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B"><span class="toc-number">3.2.</span> <span class="toc-text">2、快速开始</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3%E3%80%81%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="toc-number">3.3.</span> <span class="toc-text">3、初始化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4%E3%80%81%E6%96%B0%E5%BB%BA%E5%A3%B0%E6%98%8E%E5%BC%8F%E6%B5%81%E6%B0%B4%E7%BA%BF"><span class="toc-number">3.4.</span> <span class="toc-text">4、新建声明式流水线</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5%E3%80%81%E5%B8%B8%E7%94%A8%E6%B5%81%E6%B0%B4%E7%BA%BF-%E5%B7%A5%E5%85%B7-%E6%8F%92%E4%BB%B6-%E4%BD%BF%E7%94%A8%E5%8F%8A%E9%85%8D%E7%BD%AE"><span class="toc-number">3.5.</span> <span class="toc-text">5、常用流水线 + 工具 +插件 使用及配置</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E9%9B%86%E6%88%90git-gitlab"><span class="toc-number">3.5.1.</span> <span class="toc-text">一、集成git&#x2F;gitlab</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C%E3%80%81maven-nodeJS%E7%AD%89%E6%9E%84%E5%BB%BA%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8"><span class="toc-number">3.5.2.</span> <span class="toc-text">二、maven&#x2F;nodeJS等构建工具使用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E8%BF%9E%E6%8E%A5%E5%85%B6%E4%BB%96%E6%9C%BA%E5%99%A8-%E6%89%A7%E8%A1%8C%E8%84%9A%E6%9C%AC"><span class="toc-number">3.5.3.</span> <span class="toc-text">三、连接其他机器&#x2F;执行脚本</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E9%9B%86%E6%88%90docker"><span class="toc-number">3.5.4.</span> <span class="toc-text">四、集成docker</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E7%94%9F%E6%88%90%E5%BD%92%E6%A1%A3%E6%96%87%E4%BB%B6"><span class="toc-number">3.5.5.</span> <span class="toc-text">五、生成归档文件</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%85%B6%E4%BB%96%EF%BC%88%E5%BE%85%E8%A1%A5%E5%85%85%EF%BC%89"><span class="toc-number">4.</span> <span class="toc-text">其他（待补充）</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2020/05/14/CICD%20Jenkins%E5%85%A5%E9%97%A8%EF%BC%8C%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%92%8C%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2020/05/14/CICD%20Jenkins%E5%85%A5%E9%97%A8%EF%BC%8C%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%92%8C%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/&text=CICD：Jenkins入门，流水线和插件使用"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2020/05/14/CICD%20Jenkins%E5%85%A5%E9%97%A8%EF%BC%8C%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%92%8C%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/&title=CICD：Jenkins入门，流水线和插件使用"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2020/05/14/CICD%20Jenkins%E5%85%A5%E9%97%A8%EF%BC%8C%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%92%8C%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/&is_video=false&description=CICD：Jenkins入门，流水线和插件使用"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=CICD：Jenkins入门，流水线和插件使用&body=Check out this article: http://example.com/2020/05/14/CICD%20Jenkins%E5%85%A5%E9%97%A8%EF%BC%8C%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%92%8C%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2020/05/14/CICD%20Jenkins%E5%85%A5%E9%97%A8%EF%BC%8C%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%92%8C%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/&title=CICD：Jenkins入门，流水线和插件使用"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2020/05/14/CICD%20Jenkins%E5%85%A5%E9%97%A8%EF%BC%8C%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%92%8C%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/&title=CICD：Jenkins入门，流水线和插件使用"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2020/05/14/CICD%20Jenkins%E5%85%A5%E9%97%A8%EF%BC%8C%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%92%8C%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/&title=CICD：Jenkins入门，流水线和插件使用"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2020/05/14/CICD%20Jenkins%E5%85%A5%E9%97%A8%EF%BC%8C%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%92%8C%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/&title=CICD：Jenkins入门，流水线和插件使用"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2020/05/14/CICD%20Jenkins%E5%85%A5%E9%97%A8%EF%BC%8C%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%92%8C%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/&name=CICD：Jenkins入门，流水线和插件使用&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2020/05/14/CICD%20Jenkins%E5%85%A5%E9%97%A8%EF%BC%8C%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%92%8C%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/&t=CICD：Jenkins入门，流水线和插件使用"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2024
+    Ygria
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">archives</a></li><!--
+     --><!--
+       --><li><a href="/tags/">Tag</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>
