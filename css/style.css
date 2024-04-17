@@ -1517,57 +1517,71 @@ article .content .caption {
   content: ")";
 }
 .highlight {
-  color: #585260;
-  background: #efecf4;
+  color: #000;
+  background: #fff;
+}
+.highlight .code .subst,
+.highlight .code .title {
+  font-weight: normal;
+  color: #000;
 }
 .highlight .code .comment,
 .highlight .code .quote {
-  color: #655f6d;
+  color: #808080;
+  font-style: italic;
 }
-.highlight .code .variable,
-.highlight .code .template-variable,
-.highlight .code .attribute,
-.highlight .code .tag,
+.highlight .code .meta {
+  color: #808000;
+}
+.highlight .code .tag {
+  background: #efefef;
+}
+.highlight .code .section,
 .highlight .code .name,
-.highlight .code .regexp,
-.highlight .code .link,
+.highlight .code .literal,
+.highlight .code .keyword,
+.highlight .code .selector-tag,
+.highlight .code .type,
 .highlight .code .selector-id,
 .highlight .code .selector-class {
-  color: #be4678;
+  font-weight: bold;
+  color: #000080;
+}
+.highlight .code .attribute,
+.highlight .code .number,
+.highlight .code .regexp,
+.highlight .code .link {
+  font-weight: bold;
+  color: #00f;
 }
 .highlight .code .number,
-.highlight .code .meta,
-.highlight .code .built_in,
-.highlight .code .builtin-name,
-.highlight .code .literal,
-.highlight .code .type,
-.highlight .code .params {
-  color: #aa573c;
+.highlight .code .regexp,
+.highlight .code .link {
+  font-weight: normal;
 }
-.highlight .code .string,
+.highlight .code .string {
+  color: #008000;
+  font-weight: bold;
+}
 .highlight .code .symbol,
-.highlight .code .bullet {
-  color: #2a9292;
+.highlight .code .bullet,
+.highlight .code .formula {
+  color: #000;
+  background: #d0eded;
+  font-style: italic;
 }
-.highlight .code .title,
-.highlight .code .section {
-  color: #576ddb;
+.highlight .code .doctag {
+  text-decoration: underline;
 }
-.highlight .code .keyword,
-.highlight .code .selector-tag {
-  color: #955ae7;
+.highlight .code .variable,
+.highlight .code .template-variable {
+  color: #660e7a;
 }
-.highlight .code .deletion,
 .highlight .code .addition {
-  color: #19171c;
-  display: inline-block;
-  width: 100%;
+  background: #baeeba;
 }
 .highlight .code .deletion {
-  background-color: #be4678;
-}
-.highlight .code .addition {
-  background-color: #2a9292;
+  background: #ffc8bd;
 }
 .highlight .code .emphasis {
   font-style: italic;

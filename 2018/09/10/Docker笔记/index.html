@@ -8,19 +8,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
     <meta name="description" content="常用指令docker images 列出本地 docker 镜像docker ps -a 	列出所有正在运行的容器docker stop containerID	停止容器docker start containerID	开始容器sudo docker exec -it containerID &#x2F;bin&#x2F;bash  	进入容器内linux --mount 	 挂载 Unix 文件系统（ Unix F">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Docker">
-<meta property="og:url" content="http://example.com/2018/09/10/2018_dockerNotes/index.html">
+<meta property="og:title" content="Docker笔记">
+<meta property="og:url" content="http://example.com/2018/09/10/Docker%E7%AC%94%E8%AE%B0/index.html">
 <meta property="og:site_name" content="孤光自照">
 <meta property="og:description" content="常用指令docker images 列出本地 docker 镜像docker ps -a 	列出所有正在运行的容器docker stop containerID	停止容器docker start containerID	开始容器sudo docker exec -it containerID &#x2F;bin&#x2F;bash  	进入容器内linux --mount 	 挂载 Unix 文件系统（ Unix F">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://ygria.oss-cn-hangzhou.aliyuncs.com/Hexo/docker%E4%BC%98%E5%8A%BF.png">
 <meta property="article:published_time" content="2018-09-09T16:00:00.000Z">
-<meta property="article:modified_time" content="2024-04-16T05:23:27.424Z">
+<meta property="article:modified_time" content="2024-04-17T06:02:33.637Z">
 <meta property="article:author" content="Ygria">
+<meta property="article:tag" content="编程">
 <meta property="article:tag" content="运维">
 <meta property="article:tag" content="Linux">
-<meta property="article:tag" content="编程">
-<meta property="article:tag" content="2018">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://ygria.oss-cn-hangzhou.aliyuncs.com/Hexo/docker%E4%BC%98%E5%8A%BF.png">
     
@@ -42,7 +41,7 @@
       
     
     <!-- title -->
-    <title>Docker</title>
+    <title>Docker笔记</title>
     <!-- async scripts -->
     <!-- Google Analytics -->
 
@@ -105,17 +104,17 @@
     <br/>
     <div id="share" style="display: none">
       <ul>
-  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2018/09/10/2018_dockerNotes/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2018/09/10/2018_dockerNotes/&text=Docker"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2018/09/10/2018_dockerNotes/&title=Docker"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2018/09/10/2018_dockerNotes/&is_video=false&description=Docker"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="mailto:?subject=Docker&body=Check out this article: http://example.com/2018/09/10/2018_dockerNotes/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2018/09/10/2018_dockerNotes/&title=Docker"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2018/09/10/2018_dockerNotes/&title=Docker"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2018/09/10/2018_dockerNotes/&title=Docker"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2018/09/10/2018_dockerNotes/&title=Docker"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2018/09/10/2018_dockerNotes/&name=Docker&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2018/09/10/2018_dockerNotes/&t=Docker"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2018/09/10/Docker%E7%AC%94%E8%AE%B0/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2018/09/10/Docker%E7%AC%94%E8%AE%B0/&text=Docker笔记"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2018/09/10/Docker%E7%AC%94%E8%AE%B0/&title=Docker笔记"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2018/09/10/Docker%E7%AC%94%E8%AE%B0/&is_video=false&description=Docker笔记"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Docker笔记&body=Check out this article: http://example.com/2018/09/10/Docker%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2018/09/10/Docker%E7%AC%94%E8%AE%B0/&title=Docker笔记"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2018/09/10/Docker%E7%AC%94%E8%AE%B0/&title=Docker笔记"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2018/09/10/Docker%E7%AC%94%E8%AE%B0/&title=Docker笔记"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2018/09/10/Docker%E7%AC%94%E8%AE%B0/&title=Docker笔记"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2018/09/10/Docker%E7%AC%94%E8%AE%B0/&name=Docker笔记&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2018/09/10/Docker%E7%AC%94%E8%AE%B0/&t=Docker笔记"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
 </ul>
 
     </div>
@@ -135,7 +134,7 @@
   <header>
     
     <h1 class="posttitle p-name" itemprop="name headline">
-        Docker
+        Docker笔记
     </h1>
 
 
@@ -158,7 +157,7 @@
       
     <div class="article-tag">
         <i class="fa-solid fa-tag"></i>
-        <a class="p-category" href="/tags/2018/" rel="tag">2018</a>, <a class="p-category" href="/tags/Linux/" rel="tag">Linux</a>, <a class="p-category" href="/tags/%E7%BC%96%E7%A8%8B/" rel="tag">编程</a>, <a class="p-category" href="/tags/%E8%BF%90%E7%BB%B4/" rel="tag">运维</a>
+        <a class="p-category" href="/tags/Linux/" rel="tag">Linux</a>, <a class="p-category" href="/tags/%E7%BC%96%E7%A8%8B/" rel="tag">编程</a>, <a class="p-category" href="/tags/%E8%BF%90%E7%BB%B4/" rel="tag">运维</a>
     </div>
 
 
@@ -221,17 +220,17 @@
 
     <div id="share-footer" style="display: none">
       <ul>
-  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2018/09/10/2018_dockerNotes/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2018/09/10/2018_dockerNotes/&text=Docker"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2018/09/10/2018_dockerNotes/&title=Docker"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2018/09/10/2018_dockerNotes/&is_video=false&description=Docker"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="mailto:?subject=Docker&body=Check out this article: http://example.com/2018/09/10/2018_dockerNotes/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2018/09/10/2018_dockerNotes/&title=Docker"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2018/09/10/2018_dockerNotes/&title=Docker"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2018/09/10/2018_dockerNotes/&title=Docker"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2018/09/10/2018_dockerNotes/&title=Docker"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2018/09/10/2018_dockerNotes/&name=Docker&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2018/09/10/2018_dockerNotes/&t=Docker"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2018/09/10/Docker%E7%AC%94%E8%AE%B0/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2018/09/10/Docker%E7%AC%94%E8%AE%B0/&text=Docker笔记"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2018/09/10/Docker%E7%AC%94%E8%AE%B0/&title=Docker笔记"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2018/09/10/Docker%E7%AC%94%E8%AE%B0/&is_video=false&description=Docker笔记"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Docker笔记&body=Check out this article: http://example.com/2018/09/10/Docker%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2018/09/10/Docker%E7%AC%94%E8%AE%B0/&title=Docker笔记"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2018/09/10/Docker%E7%AC%94%E8%AE%B0/&title=Docker笔记"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2018/09/10/Docker%E7%AC%94%E8%AE%B0/&title=Docker笔记"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2018/09/10/Docker%E7%AC%94%E8%AE%B0/&title=Docker笔记"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2018/09/10/Docker%E7%AC%94%E8%AE%B0/&name=Docker笔记&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2018/09/10/Docker%E7%AC%94%E8%AE%B0/&t=Docker笔记"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
 </ul>
 
     </div>
