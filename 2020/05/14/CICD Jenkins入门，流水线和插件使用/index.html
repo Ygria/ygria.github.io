@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang=en>
+<html lang=ch>
 <head>
     <!-- so meta -->
     <meta charset="utf-8">
@@ -10,29 +10,29 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="CICD：Jenkins入门，流水线和插件使用">
 <meta property="og:url" content="http://example.com/2020/05/14/CICD%20Jenkins%E5%85%A5%E9%97%A8%EF%BC%8C%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%92%8C%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8/index.html">
-<meta property="og:site_name" content="孤光自照">
+<meta property="og:site_name" content="清川澹如此">
 <meta property="og:description" content="最近，我们使用的开发服务器被回收了，换了一台新的服务器，CI&#x2F;CD平台需要重新搭建。我的运维能力一直薄弱，所以借此机会学习了一番如何使用Jenkins进行持续集成开发和部署，实践并踩了一些坑，在此记录一下。 引言假如没有CI&#x2F;CD平台 想要部署到服务器，我们需要本地打包上传至服务器，或上传源码至服务器上打包，覆盖原来的安装包，进行部署。 当所需要部署的只是一个jar包或者只是一">
-<meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152739.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152753.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152811.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152823.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152841.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152856.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152911.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152931.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152952.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153012.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153033.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153042.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153056.png">
+<meta property="og:locale">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Ygria/Pictures@main/20240417152739.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Ygria/Pictures@main/20240417152753.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Ygria/Pictures@main/20240417152811.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Ygria/Pictures@main/20240417152823.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Ygria/Pictures@main/20240417152841.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Ygria/Pictures@main/20240417152856.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Ygria/Pictures@main/20240417152911.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Ygria/Pictures@main/20240417152931.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Ygria/Pictures@main/20240417152952.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Ygria/Pictures@main/20240417153012.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Ygria/Pictures@main/20240417153033.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Ygria/Pictures@main/20240417153042.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Ygria/Pictures@main/20240417153056.png">
 <meta property="article:published_time" content="2020-05-13T16:00:00.000Z">
-<meta property="article:modified_time" content="2024-04-17T13:21:57.000Z">
+<meta property="article:modified_time" content="2024-04-20T12:26:43.000Z">
 <meta property="article:author" content="Ygria">
 <meta property="article:tag" content="编程">
 <meta property="article:tag" content="运维">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152739.png">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/Ygria/Pictures@main/20240417152739.png">
     
     
       
@@ -190,24 +190,24 @@
 <ul>
 <li><code>docker logs jenkins </code> 查看日志</li>
 </ul>
-<p>运行之后，访问宿主机ip+ 8786（指定端口），看到Jenkins初始页面。<br><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152739.png" alt="image.png"></p>
+<p>运行之后，访问宿主机ip+ 8786（指定端口），看到Jenkins初始页面。<br><img src="https://cdn.jsdelivr.net/gh/Ygria/Pictures@main/20240417152739.png" alt="image.png"></p>
 <p>Jenkins创建成功！</p>
-<h2 id="3、初始化"><a href="#3、初始化" class="headerlink" title="3、初始化"></a>3、初始化</h2><p>稍微等待之后，自动跳转至管理员登录页面。<br><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152753.png" alt="image.png"></p>
+<h2 id="3、初始化"><a href="#3、初始化" class="headerlink" title="3、初始化"></a>3、初始化</h2><p>稍微等待之后，自动跳转至管理员登录页面。<br><img src="https://cdn.jsdelivr.net/gh/Ygria/Pictures@main/20240417152753.png" alt="image.png"></p>
 <p>创建容器时我们已经将该目录挂载到宿主机了，所以可以直接访问映射出的文件：<br>  <code>cat /jenkins_home/secrets/initialAdminPassword</code></p>
 <p>  也可以使用<code>docker exec</code>指令访问容器内文件:<br>  <code>docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword</code><br>输入密码，登陆进入新手入门页面。</p>
-<p><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152811.png" alt="image.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/Ygria/Pictures@main/20240417152811.png" alt="image.png"></p>
 <p>选择安装推荐插件。<br>如果有安装失败的，可以点击继续，直接跳过，进入Jenkins管理页面，等待后续使用时再进行安装。</p>
-<p><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152823.png" alt="image.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/Ygria/Pictures@main/20240417152823.png" alt="image.png"></p>
 <h2 id="4、新建声明式流水线"><a href="#4、新建声明式流水线" class="headerlink" title="4、新建声明式流水线"></a>4、新建声明式流水线</h2><p>点击左侧新建item，可以创建新的任务，如下图所示。</p>
-<p><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152841.png" alt="image.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/Ygria/Pictures@main/20240417152841.png" alt="image.png"></p>
 <p>选择流水线。</p>
 <p>现在就可以创建流水线，用于部署正在开发的项目了。</p>
 <h2 id="5、常用流水线-工具-插件-使用及配置"><a href="#5、常用流水线-工具-插件-使用及配置" class="headerlink" title="5、常用流水线 + 工具 +插件 使用及配置"></a>5、常用流水线 + 工具 +插件 使用及配置</h2><p>流水线语法请参考：</p>
 <p><a target="_blank" rel="noopener" href="http://jenkins-zh.cn/wechat/articles/2020/05/2020-05-08-how-to-use-the-jenkins-declarative-pipeline/">如何使用声明式流水线</a><br>可以使用Jenkins自带的流水线语句生成工具来辅助编写：</p>
-<p><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152856.png" alt="image.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/Ygria/Pictures@main/20240417152856.png" alt="image.png"></p>
 <p>插件和其他配置均为可选，根据使用需求灵活安装。<br>在此记录一些插件&#x2F;工具，并给出它们在流水线脚本中的使用范例。</p>
 <h3 id="一、集成git-gitlab"><a href="#一、集成git-gitlab" class="headerlink" title="一、集成git&#x2F;gitlab"></a>一、集成git&#x2F;gitlab</h3><ul>
-<li><p>配置凭据用于登陆验证gitlab<br><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152911.png" alt="image.png"></p>
+<li><p>配置凭据用于登陆验证gitlab<br><img src="https://cdn.jsdelivr.net/gh/Ygria/Pictures@main/20240417152911.png" alt="image.png"></p>
 </li>
 <li><p>参考语法</p>
 <figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">steps &#123;</span><br><span class="line">	git <span class="attr">branch:</span> <span class="string">&#x27;dev&#x27;</span>, <span class="attr">credentialsId:</span> <span class="string">&#x27;***&#x27;</span>, <span class="attr">url:</span> <span class="string">&#x27;https://git.***.git&#x27;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -215,11 +215,11 @@
 </li>
 </ul>
 <h3 id="二、maven-nodeJS等构建工具使用"><a href="#二、maven-nodeJS等构建工具使用" class="headerlink" title="二、maven&#x2F;nodeJS等构建工具使用"></a>二、maven&#x2F;nodeJS等构建工具使用</h3><ul>
-<li><p>工具安装和配置<br> 在全局工具配置中配置NodeJS和Maven<br><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152931.png" alt="image.png"></p>
+<li><p>工具安装和配置<br> 在全局工具配置中配置NodeJS和Maven<br><img src="https://cdn.jsdelivr.net/gh/Ygria/Pictures@main/20240417152931.png" alt="image.png"></p>
 </li>
 <li><p>使用maven打包</p>
 <figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">steps &#123;</span><br><span class="line">    script &#123;</span><br><span class="line">     sh <span class="string">&quot;mvn clean install -Dmaven.test.skip=true -Plinux&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure></li>
-<li><p>使用<code>ln -s</code>指令支持脚本中运行<br>若执行时报错无mvn指令（或npm、cnpm等），说明jenkins在&#x2F;usr&#x2F;local&#x2F;bin目录下没有找到相应的指令。可以通过建立软连接方式实现支持。<br><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417152952.png" alt="image.png"></p>
+<li><p>使用<code>ln -s</code>指令支持脚本中运行<br>若执行时报错无mvn指令（或npm、cnpm等），说明jenkins在&#x2F;usr&#x2F;local&#x2F;bin目录下没有找到相应的指令。可以通过建立软连接方式实现支持。<br><img src="https://cdn.jsdelivr.net/gh/Ygria/Pictures@main/20240417152952.png" alt="image.png"></p>
 </li>
 </ul>
 <p>可以将宿主机的工具包直接放入挂载目录，进行映射，也可以在工具配置中选择自动下载，在Jenkins内中再次安装。</p>
@@ -232,12 +232,12 @@
 <ul>
 <li><p><strong>SSH Pipeline Step</strong><br>根据示例，可得，事先添加好凭据之后，很容易在指定ip上（包括宿主机）执行文件传输、脚本执行等操作。</p>
 <figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> host = [:]</span><br><span class="line">host.name = <span class="string">&quot;host&quot;</span></span><br><span class="line">host.host = <span class="string">&quot;&quot;</span></span><br><span class="line">host.allowAnyHosts = <span class="literal">true</span></span><br><span class="line"> </span><br><span class="line">node &#123;</span><br><span class="line">    withCredentials([usernamePassword(<span class="attr">credentialsId:</span> <span class="string">&#x27;&#x27;</span>, <span class="attr">passwordVariable:</span> <span class="string">&#x27;password&#x27;</span>, <span class="attr">usernameVariable:</span> <span class="string">&#x27;userName&#x27;</span>)]) &#123;</span><br><span class="line">        host.user = userName</span><br><span class="line">        host.password = password</span><br><span class="line">        stage(<span class="string">&quot;SSH Steps Rocks!&quot;</span>) &#123;</span><br><span class="line">            writeFile <span class="attr">file:</span> <span class="string">&#x27;test.sh&#x27;</span>, <span class="attr">text:</span> <span class="string">&#x27;ls&#x27;</span></span><br><span class="line">            sshCommand <span class="attr">remote:</span> host, <span class="attr">command:</span> <span class="string">&#x27;for i in &#123;1..5&#125;; do echo -n \&quot;Loop \$i \&quot;; date ; sleep 1; done&#x27;</span></span><br><span class="line">            sshScript <span class="attr">remote:</span> host, <span class="attr">script:</span> <span class="string">&#x27;test.sh&#x27;</span></span><br><span class="line">            sshPut <span class="attr">remote:</span> host, <span class="attr">from:</span> <span class="string">&#x27;test.sh&#x27;</span>, <span class="attr">into:</span> <span class="string">&#x27;.&#x27;</span></span><br><span class="line">            sshGet <span class="attr">remote:</span> host, <span class="attr">from:</span> <span class="string">&#x27;test.sh&#x27;</span>, <span class="attr">into:</span> <span class="string">&#x27;test_new.sh&#x27;</span>, <span class="attr">override:</span> <span class="literal">true</span></span><br><span class="line">            sshRemove <span class="attr">remote:</span> host, <span class="attr">path:</span> <span class="string">&#x27;test.sh&#x27;</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>构建结果<br><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153012.png" alt="image.png"></p>
+<p>构建结果<br><img src="https://cdn.jsdelivr.net/gh/Ygria/Pictures@main/20240417153012.png" alt="image.png"></p>
 </li>
-<li><p><strong>Publish Over SSH</strong><br><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153033.png" alt="image.png"></p>
+<li><p><strong>Publish Over SSH</strong><br><img src="https://cdn.jsdelivr.net/gh/Ygria/Pictures@main/20240417153033.png" alt="image.png"></p>
 </li>
 </ul>
-<p>在Jenkins管理&#x2F;系统管理&#x2F;PublishOverSSH的相关配置中配置所需要的宿主机IP、用户、密码等等信息<br><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153042.png" alt="image.png"></p>
+<p>在Jenkins管理&#x2F;系统管理&#x2F;PublishOverSSH的相关配置中配置所需要的宿主机IP、用户、密码等等信息<br><img src="https://cdn.jsdelivr.net/gh/Ygria/Pictures@main/20240417153042.png" alt="image.png"></p>
 <p>可以在展开的高级设置中配置SSH服务器。<br>查看<a href="%5Bhttps://plugins.jenkins.io/publish-over-ssh/%5D(https://plugins.jenkins.io/publish-over-ssh/)">Publish-Over-Server 插件说明</a>获取高级用法。</p>
 <h3 id="四、集成docker"><a href="#四、集成docker" class="headerlink" title="四、集成docker"></a>四、集成docker</h3><p>因为我们的Jenkins服务是作为docker容器运行的，所以需要在容器内调用docker命令。<br>容器内调用docker命令有两种：</p>
 <ul>
@@ -255,7 +255,7 @@
 </ul>
 <h3 id="五、生成归档文件"><a href="#五、生成归档文件" class="headerlink" title="五、生成归档文件"></a>五、生成归档文件</h3><p>示例：</p>
 <figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">pipeline &#123;</span><br><span class="line">    </span><br><span class="line">    agent any</span><br><span class="line"></span><br><span class="line"> stages &#123;</span><br><span class="line">     </span><br><span class="line">     stage(<span class="string">&quot;build&quot;</span>)&#123;</span><br><span class="line">         steps&#123;</span><br><span class="line">             sh <span class="string">&#x27;touch archive.jar&#x27;</span></span><br><span class="line">         &#125;</span><br><span class="line">         </span><br><span class="line">     &#125;</span><br><span class="line">     </span><br><span class="line">     stage(<span class="string">&#x27;archive&#x27;</span>) &#123;  </span><br><span class="line">            steps &#123;</span><br><span class="line">                archiveArtifacts <span class="attr">artifacts:</span> <span class="string">&#x27;archive.jar&#x27;</span>, <span class="attr">fingerprint:</span> <span class="literal">true</span> </span><br><span class="line">            &#125;</span><br><span class="line">    &#125;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>在build过程中生成归档文件，在archive过程中归档。<br><img src="https://raw.githubusercontent.com/Ygria/Pictures/main/20240417153056.png" alt="image.png"></p>
+<p>在build过程中生成归档文件，在archive过程中归档。<br><img src="https://cdn.jsdelivr.net/gh/Ygria/Pictures@main/20240417153056.png" alt="image.png"></p>
 <p>在此页面上可以直接下载归档好的文件。</p>
 <h1 id="其他（待补充）"><a href="#其他（待补充）" class="headerlink" title="其他（待补充）"></a>其他（待补充）</h1><p>1、配置时区<br>打开系统管理&#x2F;命令行，运行：<br><code>System.setProperty(&#39;org.apache.commons.jelly.tags.fmt.timeZone&#39;, &#39;Asia/Shanghai&#39;)</code></p>
 
