@@ -27,7 +27,7 @@
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/Ygria/Pictures@main/20240417153042.png">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/Ygria/Pictures@main/20240417153056.png">
 <meta property="article:published_time" content="2020-05-13T16:00:00.000Z">
-<meta property="article:modified_time" content="2024-04-20T12:26:43.000Z">
+<meta property="article:modified_time" content="2024-04-20T13:34:55.000Z">
 <meta property="article:author" content="Ygria">
 <meta property="article:tag" content="编程">
 <meta property="article:tag" content="运维">
@@ -193,7 +193,7 @@
 <p>运行之后，访问宿主机ip+ 8786（指定端口），看到Jenkins初始页面。<br><img src="https://cdn.jsdelivr.net/gh/Ygria/Pictures@main/20240417152739.png" alt="image.png"></p>
 <p>Jenkins创建成功！</p>
 <h2 id="3、初始化"><a href="#3、初始化" class="headerlink" title="3、初始化"></a>3、初始化</h2><p>稍微等待之后，自动跳转至管理员登录页面。<br><img src="https://cdn.jsdelivr.net/gh/Ygria/Pictures@main/20240417152753.png" alt="image.png"></p>
-<p>创建容器时我们已经将该目录挂载到宿主机了，所以可以直接访问映射出的文件：<br>  <code>cat /jenkins_home/secrets/initialAdminPassword</code></p>
+<p><a href="../../../travel-trace/index.html">index.html</a><br>创建容器时我们已经将该目录挂载到宿主机了，所以可以直接访问映射出的文件：<br>  <code>cat /jenkins_home/secrets/initialAdminPassword</code></p>
 <p>  也可以使用<code>docker exec</code>指令访问容器内文件:<br>  <code>docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword</code><br>输入密码，登陆进入新手入门页面。</p>
 <p><img src="https://cdn.jsdelivr.net/gh/Ygria/Pictures@main/20240417152811.png" alt="image.png"></p>
 <p>选择安装推荐插件。<br>如果有安装失败的，可以点击继续，直接跳过，进入Jenkins管理页面，等待后续使用时再进行安装。</p>
