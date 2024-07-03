@@ -12,6 +12,16 @@ body {
   box-shadow: 0 0.1rem 0.4rem rgba(0,0,0,0.05), 0 0 0.05rem rgba(0,0,0,0.1);
   background-color: #fafafa;
 }
+.admonition.vertical-cn-note {
+  border-left: 0rem;
+  font-family: "JHLST";
+}
+.vertical-cn-note>.admonition-title::before {
+  display: none;
+}
+.vertical-cn-note>.admonition-title {
+  background-color: #f1f1f1;
+}
 .admonition.zh-cn-note {
   border-left: 0rem;
   font-family: "JHLST";
@@ -89,4 +99,23 @@ p.admonition-title {
 }
 .admonition>:last-child {
   margin-bottom: 0 !important;
+}
+.admonition.vertical-cn-note {
+  color: #30281e; /* 深棕色字体，模拟古书效果 */
+  border-left: 0rem;
+  font-family: "HWMCT";
+  writing-mode: vertical-rl;
+  max-height: 305px;
+  line-height: 1.8;
+  text-align: justify;
+  text-justify: inter-ideograph;
+}
+.vertical-cn-note>.admonition-title::before {
+  display: none;
+}
+.vertical-cn-note>.admonition-title {
+  background-color: #f1f1f1;
+  margin: 0px !important;
+  padding: 12px !important;
+  font-size: 18px;
 }

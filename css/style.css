@@ -442,7 +442,12 @@ body td {
 @font-face {
   font-style: normal;
   font-family: "JHLST";
-  src: local("JHLST"), url("../lib/JHLST/JHLST.ttf") format("truetype");
+  src: local("JHLST"), url("../lib/zh-fonts/JHLST.ttf") format("truetype");
+}
+@font-face {
+  font-style: normal;
+  font-family: "HWMCT";
+  src: local("HWMCT"), url("../lib/zh-fonts/HWMCT.otf") format("truetype");
 }
 *,
 *:before,
